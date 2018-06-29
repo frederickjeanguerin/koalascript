@@ -1,0 +1,6 @@
+{
+	// "src": [ "samples/basic.k" ],
+	// "cmd": true,
+    // "run": true
+    "debug" : true
+}

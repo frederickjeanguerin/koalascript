@@ -2,14 +2,46 @@
   "name": "koalalang",
   "version": "1.0.0",
   "description": "",
-  "main": "flex.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "nyc --reporter=html --reporter=text mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "prepare": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frederickjeanguerin/koalascript.git"
   },
   "keywords": [],
-  "author": "Frédéric Guérin",
-  "license": "ISC",
+  "author": "Frédéric Guérin <frederickjeanguerin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frederickjeanguerin/koalascript/issues"
+  },
+  "homepage": "https://github.com/frederickjeanguerin/koalascript#readme",
   "devDependencies": {
-    "chai": "^4.1.2"
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.0.1",
+    "del": "^3.0.0",
+    "eslint-plugin-mocha": "^5.0.0",
+    "gulp": "^3.9.1",
+    "gulp-nearley": "^1.0.0",
+    "gulp-notify": "^3.2.0",
+    "gulp-rename": "^1.2.3",
+    "gulp-run-command": "0.0.9",
+    "mocha": "^5.2.0",
+    "nearley": "^2.13.0",
+    "nyc": "^12.0.2",
+    "string-to-stream": "^1.1.1",
+    "test-cli": "^0.1.0"
+  },
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "command-line-args": "^5.0.2",
+    "concat-stream": "^1.6.2",
+    "json5": "^1.0.1",
+    "string-enum": "^1.2.1",
+    "vm2": "^3.6.0"
   }
 }
