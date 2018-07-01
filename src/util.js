@@ -6,6 +6,7 @@ module.exports =
     runCmd,
     stringAsStream,
     changeExt,
+    nextPosition,
 };
 
 const
@@ -90,3 +91,25 @@ function changeExt(fileName, newExt, fromExt = undefined){
     return fromExt && ext !== fromExt ? undefined : newName;
 }
 
+/**
+ * Computes the next position {line, column} of a token from the position of a previous one.
+ * Lines are counted starting at 1 and column starting at 1.
+ */
+function nextPosition ( /* istanbul ignore next: type hint */
+    code = "",          /* istanbul ignore next: type hint */
+    nextOffset = 0,     /* istanbul ignore next: type hint */
+    prevOffset = 0,     /* istanbul ignore next: type hint */
+    prevLine = 1,       /* istanbul ignore next: type hint */
+    prevCol = 1,
+) {
+    let line = prevLine, col = prevCol;
+    for( let offset = prevOffset; offset < nextOffset; offset++ ) {
+        if(code[offset] === "\n") {
+            col = 1;
+            line ++;
+        } else {
+            col ++;
+        }
+    }
+    return {line, col};
+}

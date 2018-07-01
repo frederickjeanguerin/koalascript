@@ -48,7 +48,10 @@ class Logger {
         this.debugs = [];
         this.results = [];
     }
-
+    /**
+     * Clear all logs.
+     * @return {Logger} itself
+     */
     restore() {
         this.errors.length = 0;
         this.warnings.length = 0;
@@ -57,6 +60,7 @@ class Logger {
         this.results.length = 0;
         this.fakeFs = new Map(this.fakeFiles || []);
         this.isStdinConsumed = false;
+        return this;
     }
 
     report(reportFn, colorFn, subject, ...details) {
@@ -153,10 +157,12 @@ class Logger {
     /**
      * Override previous options with new ones
      * @param  {Object<string, any>} options={}
+     * @return {Logger} itself
      */
     reconfig(options = {})
     {
         this.options = {...this.options, ...options};
+        return this;
     }
 
     /**

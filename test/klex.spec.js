@@ -55,6 +55,8 @@ describe('klex', function() {
             type: TT.unmatched_char,
             text: unmatchedChar,
             index: 1,
+            col: 2,
+            line: 1,
             info: undefined
         });
     });

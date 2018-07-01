@@ -25,9 +25,9 @@ describe('generator', function() {
     });
 
     it('JS line', function() {
-        expect(gen("$ 10").jscode).eq("10");
-        expect(gen("$ 10\n $ 20").jscode).eq("10;20");
-        expect(gen("$ console.log(99)").jscode).eq("console.log(99)");
+        expect(gen("$ 10").jscode).eq("10;");
+        expect(gen("$ 10\n $ 20").jscode).eq("10;\n20;");
+        expect(gen("$ console.log(99)").jscode).eq("console.log(99);");
     });
 
     it('Some errors', function() {

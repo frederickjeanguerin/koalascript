@@ -9,7 +9,7 @@ chai.use(chaiAsPromised);
 const path = require('path');
 
 // Tested module
-const { changeExt, countLines, countChar, runCmd, readAll, stringAsStream } = require('../src/util');
+const { changeExt, countLines, countChar, nextPosition, runCmd, readAll, stringAsStream } = require('../src/util');
 
 describe('util', function() {
 
@@ -59,6 +59,16 @@ describe('util', function() {
         expect(changeExt("bobo.x.x", ".y")).eq("bobo.x.y");
         expect(changeExt("bobo.x", ".y", ".x")).eq("bobo.y");
         expect(changeExt("bobo.x", ".y", ".z")).undefined;
+    });
+
+    it('#nextPosition', function() {
+        expect(nextPosition()).eql({line:1, col:1});
+        expect(nextPosition(" ")).eql({line:1, col:1});
+        expect(nextPosition("   ", 3)).eql({line:1, col:4});
+        expect(nextPosition("   \n\n   ", 8)).eql({line:3, col:4});
+        expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, col:4});
+        expect(nextPosition("   \n\n   ", 8, 5, 0, 0)).eql({line:0, col:3});
+        expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, col:4});
     });
 
 });

@@ -13,6 +13,11 @@ const
     init_state = parser.save(),     // Save parser initial state for restorations
     tt = parser.lexer.tokenTypes,   // Short naming for Token types
 
+    // Babel parser and generator
+    {parse : babelParse} = require("@babel/parser"),
+    {default: babelGenerate} = require("babel-generator"),
+    babelCodeFrame = require("babel-code-frame"),
+
     ____end_const = undefined;
 
 // Exported constants associated with the generator
@@ -32,14 +37,14 @@ function gen(               /* istanbul ignore next: type hint */
     kcode = "",
     { selfContained = true, parseOnly = false } = {})
 {
-    let jscode;
+    let jscode, sourceMap;
     const parsing = parse(log, kcode, {selfContained});
 
     if( parsing != undefined && !(parseOnly || log.hasErrors) ) {
-        jscode = transpile(parsing);
+        ({jscode, sourceMap} = transpile(log, parsing, kcode));
     }
 
-    return {parsing, jscode};
+    return {parsing, jscode, sourceMap};
 }
 
 
@@ -71,6 +76,7 @@ function parse(                     /* istanbul ignore next: type hint */
         console.assert(parsings.length >= 0, parsings);
 
         /* istanbul ignore if : grammar should not be ambiguous */
+
         // If many parsings, the grammar is ambiguous
         // Output some debug info before continuing the process.
         if(parsings.length > 1)
@@ -104,19 +110,22 @@ function parse(                     /* istanbul ignore next: type hint */
         // }
     }
 
-    // Prepare parser for the next code generation
+    // Prepare parser for the next code generation (repl)
     if ( log.hasErrors || parsing != undefined ) parser.restore(init_state);
     return parsing;
 }
 
 
 /**
- * @param  {Token[]} stmts
- * @returns {string} -- jscode
+ * @returns {{jscode:string, sourceMap:string}} -- jscode and sourceMap
  */
-function transpile(stmts)
+function transpile(         /* istanbul ignore next: type hint */
+    log = new Logger(),     /* istanbul ignore next: type hint */
+    stmts = [new Token()],  /* istanbul ignore next: type hint */
+    kcode = "")
 {
-    let jscode = "";
+    const body = [];
+    const sources = {};
     for ( let stmt of stmts ) {
 
         const token = stmt;
@@ -124,9 +133,7 @@ function transpile(stmts)
         switch(token.type) {
 
             case tt.js_line:
-                // TODO validate inline js code before insertion
-                jscode += (jscode ? ";" : "") + token.info;
-                break;
+                js_line(token); break;
 
             /* istanbul ignore next */
             default:
@@ -134,7 +141,30 @@ function transpile(stmts)
                 throw Error(`Unrecognized token type '${token.type}'`);
         }
     }
-    return jscode;
+    const {code : jscode, map : sourceMap} = babelGenerate({type:"Program", body}, {sourceMaps: true}, sources);
+    return {jscode, sourceMap};
+
+    function js_line(token = new Token())
+    {
+        // const {line, col} = token.getPosition(kcode);
+        const sourceName = `Internal line ${token.line} col ${token.col}`;
+        const source = " ".repeat(token.col) + token.text.slice(1);
+        sources[sourceName] = source;
+        try {
+            const ast = babelParse(source, {
+                sourceFilename: sourceName,
+                // * the startLine option doesnt work, so the line needs to be adjusted (see below)
+                // startLine: token.line
+            });
+            body.push(...ast.program.body);
+        } catch (err) {
+            // syntax error
+            const {loc, message } = err;
+            const line = loc.line + token.line - 1;
+            const correctedMessage = message.replace(new RegExp("[(]" + loc.line + "[:]"), "(" + line + ":");
+            log.error(correctedMessage, "\n" + babelCodeFrame(kcode, line, loc.column + 1));
+        }
+    }
 }
 
 module.exports = gen;

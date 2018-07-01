@@ -2,15 +2,19 @@ module.exports = class Token {
     /**
      * @param {string} type     Type of token, e.g. 'identifier' or 'number'
      * @param {string} text     The token string itself
-     * @param {number} index    Offset of the token in the source file.
+     * @param {number} index    Offset of the token in the source file (0 based)
+     * @param {number} line     Line of the token in the source file (1 based).
+     * @param {number} col      Column of the token in the source file (1 based).
      * @param {any} info        Additionnal info, related to the token type.
      */
-    constructor(type, text, index, info = undefined){
+    constructor(type, text, index, line, col, info = undefined){
         if(!type || !text || index < 0)
             throw "Invalid argument";
         this.type = type;
         this.text = text;
         this.index = index;
+        this.line = line;
+        this.col = col;
         this.info = info;
     }
 

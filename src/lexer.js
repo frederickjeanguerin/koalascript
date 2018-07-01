@@ -1,6 +1,8 @@
 "use strict";
 module.exports = Lexer;
+Lexer.Actions = Actions;
 
+const {nextPosition} = require('./util');
 const isNode = typeof window === 'undefined';
 const idRegExp = /[a-z_][a-z0-9_-]*/i;
 
@@ -59,9 +61,8 @@ Lexer.RULE_EOF = '<<EOF>>';
  * @public
  */
 Lexer.prototype.reset = function (source = '', state = Lexer.STATE_INITIAL) {
-    this.source = source;
+    this.setSource(source);
     this.matchInfo = undefined;
-    this.index = 0;
     this.text = undefined;
     this.state = state;
 
@@ -373,7 +374,7 @@ Lexer.prototype.addRules = function (...rules) {
  */
 Lexer.prototype.setSource = function (source) {
     this.source = source;
-    this.index = 0;
+    this.resetIndex();
     return this;
 };
 
@@ -551,11 +552,12 @@ Lexer.prototype.scan = function () {
         if (!isEOF) {
             const unmatchedChar = this.source.charAt(this.index);
             this.text += unmatchedChar;
-            this.index++;
+            let token;
             if(this.unmatchedCharFn){
-                return this.unmatchedCharFn(unmatchedChar, this.index - 1, this.source);
+                token = this.unmatchedCharFn(this.actions);
             }
-            return this.actions.echo();
+            this.advanceIndex();
+            return token || this.actions.echo();
         } else {
             this.text = '';
             return this.actions.terminate();
@@ -563,18 +565,16 @@ Lexer.prototype.scan = function () {
     }
 
     this.text += matchedValue;
-    this.index += this.text.length;
-
     var rejectedBefore = this.rejectedRules.length;
     var actionResult = matchedRule.action ? matchedRule.action(this.actions) : this.actions.discard();
     var hasRejection = this.rejectedRules.length > rejectedBefore;
-
     // reset reject state if there is no rejection in last action
     if (hasRejection) {
         // ignore result if there is rejection in action
         return;
     }
 
+    this.advanceIndex(this.text.length);
     this.rejectedRules = [];
 
     // rule action could change buffer or position, so EOF state could be changed too
@@ -639,6 +639,21 @@ Lexer.prototype.expandDefinitions = function (source) {
     return Lexer.expandDefinitions(this.definitions, source);
 };
 
+Lexer.prototype.resetIndex = function(offset = 0)
+{
+    const {line, col} = nextPosition(this.source, offset, 0, 1, 1);
+    this.index = offset;
+    this.line = line;
+    this.col = col;
+};
+
+Lexer.prototype.advanceIndex = function(offset = 1)
+{
+    const {line, col} = nextPosition(this.source, this.index + offset, this.index, this.line, this.col);
+    this.index = this.index + offset;
+    this.line = line;
+    this.col = col;
+};
 
 /**
  * Expands definitions in source.
@@ -709,11 +724,11 @@ Lexer.isRegExpMatchEOL = function (re) {
  * If this function returns undefined, lexing will simply continue with the next character,
  * hence no error and nothing returned to the client.
  *
- * @param  {function(string, number, string)} unmatchedCharFn
+ * @param  {function(Action)} unmatchedCharFn
  * @return {Lexer}
  * @public
  */
-Lexer.prototype.setUnmatchedCharFn = function(unmatchedCharFn = undefined){
+Lexer.prototype.setUnmatchedCharFn = function(unmatchedCharFn){
     this.unmatchedCharFn = unmatchedCharFn;
     return this;
 };
@@ -738,6 +753,16 @@ function Actions(lexer = new Lexer)
         get index ()
         {
             return lexer.index;
+        },
+
+        get line ()
+        {
+            return lexer.line;
+        },
+
+        get col ()
+        {
+            return lexer.col;
         },
 
         get info ()
@@ -769,7 +794,6 @@ function Actions(lexer = new Lexer)
 
         reject()
         {
-            lexer.index -= lexer.text.length;
             lexer.rejectedRules.push(lexer.ruleIndex);
         },
 
@@ -783,10 +807,6 @@ function Actions(lexer = new Lexer)
          */
         less (n)
         {
-            if (n > lexer.text.length) {
-                return;
-            }
-            lexer.index -= lexer.text.length - n;
             lexer.text = lexer.text.substr(0, n);
         },
 
@@ -795,7 +815,8 @@ function Actions(lexer = new Lexer)
          */
         unput (s = "")
         {
-            lexer.source = lexer.source.substr(0, lexer.index) + s + lexer.source.substr(lexer.index);
+            const insertionIndex = lexer.index + lexer.text.length;
+            lexer.source = lexer.source.substr(0, insertionIndex) + s + lexer.source.substr(insertionIndex);
         },
 
         /**
@@ -805,8 +826,8 @@ function Actions(lexer = new Lexer)
          */
         input (n)
         {
-            var value = lexer.source.substr(lexer.index, n === undefined ? 1 : n);
-            lexer.index += value.length;
+            var value = lexer.source.substr(lexer.index + lexer.text.length, n === undefined ? 1 : n);
+            lexer.advanceIndex(value.length);
             return value;
         },
 
@@ -818,9 +839,9 @@ function Actions(lexer = new Lexer)
 
         restart (newSource) {
             if (newSource !== undefined) {
-                lexer.source = newSource;
+                lexer.setSource(newSource);
             }
-            lexer.index = 0;
+            lexer.resetIndex();
         },
     };
 }

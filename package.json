@@ -37,6 +37,9 @@
     "test-cli": "^0.1.0"
   },
   "dependencies": {
+    "@babel/parser": "^7.0.0-beta.51",
+    "babel-code-frame": "^6.26.0",
+    "babel-generator": "^6.26.1",
     "chalk": "^2.4.1",
     "command-line-args": "^5.0.2",
     "concat-stream": "^1.6.2",
