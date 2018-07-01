@@ -17,7 +17,7 @@ const log = new Logger({
         ["hello2.k", samples.kcode.helloFrom('hello2')],
         ["hello3.k", samples.kcode.helloFrom('hello3')],
         ["buggy-parse.k", "$"],
-        ["buggy-run.k", "$ 10 +"],
+        ["buggy-run.k", "$ throw Error('foobug')"],
         ["bad-name.bad", ""],
     ]
 });
@@ -68,12 +68,12 @@ describe('main', function() {
         expect(log.results.pop()).match(/50/);
 
         // run from command line with error
-        expect(await main_(["-cr", "$", "20+"])).eq(1);
-        expect(log.errors.pop()).match(/SyntaxError/i);
+        expect(await main_(["-cr", "$", "throw", "Error('foobug')"])).eq(1);
+        expect(log.errors.pop()).match(/foobug/);
 
         // run file with error
         expect(await main_(["--run", "buggy-run.k"])).eq(1);
-        expect(log.errors.pop()).match(/SyntaxError/i);
+        expect(log.errors.pop()).match(/foobug/);
 
         log.hasSomeLogs.should.be.false;
     });

@@ -39,10 +39,9 @@ task('clean', function() {
     return del(['src/_*', 'samples/*.js', 'coverage/**', '.nyc_output/**']);
 });
 
-// tasks to run manual tests
-task('parse', run('node src/@parse'));
-task('reparse', ['default'], run('node src/@parse'));
-task('gen', run('node src/generator'));
-task('regen', ['default'], run('node src/generator'));
-task('repl', run('node src/repl'));
-task('rerepl', ['default'], run('node src/repl'));
+task('delete-snapshots', function(){
+    return del(['__snapshots__/**']);
+});
+
+task('update-snapshots', ['delete-snapshots'], run('mocha'));
+

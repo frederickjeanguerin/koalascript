@@ -147,14 +147,15 @@ function transpile(         /* istanbul ignore next: type hint */
     function js_line(token = new Token())
     {
         // const {line, col} = token.getPosition(kcode);
-        const sourceName = `Internal line ${token.line} col ${token.col}`;
+        const sourceName = `Inline jscode line ${token.line} col ${token.col}`;
         const source = " ".repeat(token.col) + token.text.slice(1);
         sources[sourceName] = source;
         try {
             const ast = babelParse(source, {
                 sourceFilename: sourceName,
-                // * the startLine option doesnt work, so the line needs to be adjusted (see below)
                 // startLine: token.line
+                // NB: the startLine option doesnt work, so the line needs to be adjusted afterward (see below)
+                // we could also update the AST directly.
             });
             body.push(...ast.program.body);
         } catch (err) {
