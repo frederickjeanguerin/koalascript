@@ -13,3 +13,23 @@ Unexpected token (3:18)
   4 |             # somme comment after
   5 |         
 `
+
+exports['generator Generate map file 1'] = `
+console.log("Hello World!");
+console.log("From KoalaScript!");
+`
+
+exports['generator Generate map file 2'] = {
+  "version": 3,
+  "sources": [
+    "default"
+  ],
+  "names": [
+    "console",
+    "log"
+  ],
+  "mappings": "AAEUA,QAAQC,GAAR,CAAY,cAAZ;AACAD,QAAQC,GAAR,CAAY,mBAAZ",
+  "sourcesContent": [
+    "\n        # A very simple K program\n        $ console.log(\"Hello World!\")\n        $ console.log(\"From KoalaScript!\")\n    "
+  ]
+}

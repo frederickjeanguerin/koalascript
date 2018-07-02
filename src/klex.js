@@ -1,4 +1,6 @@
 "use strict";
+/* istanbul ignore file */
+
 const
     Lexer = require('./lexer'),
     LexerNearley = require('./lexer-nearley'),
@@ -37,7 +39,11 @@ const lexer = new Lexer()
 
     );
 
-function newToken(type = "", match = Lexer.Actions(), info = undefined) {
+function newToken(
+    type = "",
+    match = Lexer.Actions(),
+    info = undefined
+) {
     return new Token (
         type,
         match.text,

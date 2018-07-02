@@ -36,7 +36,7 @@ task('nearley', () =>
 );
 
 task('clean', function() {
-    return del(['src/_*', 'samples/*.js', 'coverage/**', '.nyc_output/**']);
+    return del(['src/_*', 'samples/*.js', 'coverage/**', '.nyc_output/**', 'temp/**']);
 });
 
 task('delete-snapshots', function(){

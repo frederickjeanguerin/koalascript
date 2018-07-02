@@ -6,15 +6,15 @@ const Lexer = require('./lexer');
 
 module.exports = class LexerNearley {
 
-    constructor(
-        lexer = new Lexer,
+    constructor(                                                    /* istanbul ignore next: type hint */
+        lexer = new Lexer,                                          /* istanbul ignore next: type hint */
         tokenTypes = new Object,
         isValidTokenFn = ((token) => (void token, true)),
-        formatErrorFn = ((token, source = "") => (void source, token + "")),
+        formatErrorFn = ((token, source = "") => (void source, token.text + "")),
     ){
         this.lexer = lexer;
         this.isValidToken = ((token) =>
-            token.text && token.type && token.type in tokenTypes && isValidTokenFn(token));
+            token instanceof Object && token.text && token.type && token.type in tokenTypes && isValidTokenFn(token));
         this.tokenTypes = tokenTypes;
         this.formatErrorFn = formatErrorFn;
     }
@@ -51,8 +51,7 @@ module.exports = class LexerNearley {
      *
      * NB this is not a nearley interface function, but is useful for testing purpose.
      */
-    lexAll(source = undefined)
-    {
+    lexAll(source = undefined){
         return [...this.allTokens(source)];
     }
 
@@ -90,7 +89,7 @@ module.exports = class LexerNearley {
      * This method gets called by Nearley at parser initialisation or ???.
      * It works together with the `save()` method.
      */
-    reset(toSource = "", savedState)
+    reset(toSource, savedState)
     {
         this.lexer.reset(toSource, savedState);
     }

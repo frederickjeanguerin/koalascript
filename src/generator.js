@@ -35,13 +35,13 @@ gen.lexer = parser.lexer;
 function gen(               /* istanbul ignore next: type hint */
     log = new Logger,       /* istanbul ignore next: type hint */
     kcode = "",
-    { selfContained = true, parseOnly = false } = {})
+    { selfContained = true, parseOnly = false, sourceName = "default" } = {})
 {
     let jscode, sourceMap;
     const parsing = parse(log, kcode, {selfContained});
 
     if( parsing != undefined && !(parseOnly || log.hasErrors) ) {
-        ({jscode, sourceMap} = transpile(log, parsing, kcode));
+        ({jscode, sourceMap} = transpile(log, parsing, kcode, sourceName));
     }
 
     return {parsing, jscode, sourceMap};
@@ -115,15 +115,15 @@ function parse(                     /* istanbul ignore next: type hint */
     return parsing;
 }
 
-
 /**
  * @returns {{jscode:string, sourceMap:string}} -- jscode and sourceMap
  */
 function transpile(         /* istanbul ignore next: type hint */
     log = new Logger(),     /* istanbul ignore next: type hint */
     stmts = [new Token()],  /* istanbul ignore next: type hint */
-    kcode = "")
-{
+    kcode = "",             /* istanbul ignore next: type hint */
+    sourceName = "",
+){
     const body = [];
     const sources = {};
     for ( let stmt of stmts ) {
@@ -146,24 +146,18 @@ function transpile(         /* istanbul ignore next: type hint */
 
     function js_line(token = new Token())
     {
-        // const {line, col} = token.getPosition(kcode);
-        const sourceName = `Inline jscode line ${token.line} col ${token.col}`;
-        const source = " ".repeat(token.col) + token.text.slice(1);
-        sources[sourceName] = source;
+        // We add lines before and indent the js code to produce good line and column numbers when parsing
+        const source = "\n".repeat(token.line - 1) + " ".repeat(token.col) + token.text.slice(1);
+        sources[sourceName] = kcode;
         try {
             const ast = babelParse(source, {
                 sourceFilename: sourceName,
-                // startLine: token.line
-                // NB: the startLine option doesnt work, so the line needs to be adjusted afterward (see below)
-                // we could also update the AST directly.
             });
             body.push(...ast.program.body);
         } catch (err) {
             // syntax error
             const {loc, message } = err;
-            const line = loc.line + token.line - 1;
-            const correctedMessage = message.replace(new RegExp("[(]" + loc.line + "[:]"), "(" + line + ":");
-            log.error(correctedMessage, "\n" + babelCodeFrame(kcode, line, loc.column + 1));
+            log.error(message, "\n" + babelCodeFrame(kcode, loc.line, loc.column + 1));
         }
     }
 }

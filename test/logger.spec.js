@@ -96,9 +96,11 @@ describe('Logger', function() {
     });
 
     it('reading fake files', function() {
-        const log = new Logger({fakeFiles:[["abc", "123"], ["def", "456"]]});
+        const log = new Logger({fakeFiles:[["abc", "123"], ["def", "456"]], options: {debug:""}});
         log.readFile("def").should.eq("456");
-        (() => log.readFile("de")).should.throw(Error);
+        expect(log.readFile("de")).undefined;
+        expect(log.errors.pop()).match(/File not found/i);
+        log.hasSomeLogs.should.be.false;
     });
 
     it('writing fake files', function() {

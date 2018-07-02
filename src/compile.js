@@ -6,6 +6,9 @@ compile.runCode = runCode;
 compile.compileFile = compileFile;
 
 const
+    // External modules
+    convert = require('convert-source-map'),
+
     // Internal modules
     gen             = require("./generator"),
     RunJs           = require('./runjs'),
@@ -26,14 +29,14 @@ const
 async function compile (
     log,
     {
-        src = [],       // Source files to compile
-        cmd = false,    // true if source is from command line
-        // debug = false,
-        run = false,    // run jscode after compilation (and don't save/export it)
+        src = [],           // Source files to compile
+        cmd = false,        // true if source is from command line
+        run = false,        // run jscode after compilation (and don't save/export it)
         checkonly = false,  // check code only (dont save and dont run)
+        noMap = false,      // dont produce/embed source map file
     } = {},
 ){
-    const compileCode_ = compileCode.bind(null, log, {checkonly, run});
+    const compileCode_ = compileCode.bind(null, log, {checkonly, run, noMap});
     try
     {
         // If source from command line
@@ -92,24 +95,30 @@ function compileFile(               /* istanbul ignore next */
 
     log.info('Compiling:', fileName, " -> ", targetName);
 
-    compileCode(log.readFile(fileName), fileName, targetName);
+    const kcode = log.readFile(fileName);
+
+    if (kcode)
+    {
+        compileCode(kcode, fileName, targetName);
+    }
 }
+
 
 // *Most default args (but the last) are provided to give type hints.
 function compileCode(   /* istanbul ignore next */
     log = new Logger,
-    {checkonly = false, run = false} = {},
+    {checkonly = false, run = false, noMap = false} = {},
     kcode = "",
     sourceName = "unspecified",
     targetFile = STDOUT)
 {
     if (!kcode)
     {
-        log.error("No source code in: " + sourceName);
+        log.error("No source code in:", sourceName);
         return;
     }
 
-    const { jscode } = gen(log, kcode);
+    let { jscode, sourceMap } = gen(log, kcode, {sourceName});
 
     if (log.hasErrors) return;
 
@@ -123,6 +132,11 @@ function compileCode(   /* istanbul ignore next */
     {
         runCode(log, jscode);
         return;
+    }
+
+    if(!noMap)
+    {
+        jscode += "\n\n\n" + convert.fromObject(sourceMap).toComment();
     }
 
     if(targetFile === STDOUT)

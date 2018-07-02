@@ -1,2 +1,3 @@
-build/*.js
+__snapshots__
+build
 src/klex.js

@@ -99,3 +99,5 @@ $RECYCLE.BIN/
 
 src/_*
 samples/*.js
+temp/
+

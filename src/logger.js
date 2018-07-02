@@ -187,11 +187,24 @@ class Logger {
      */
     readFile(fileName)
     {
-        return this.useFakeFiles ? check(this.fakeFs.get(fileName)) : fs.readFileSync(fileName, {encoding:"utf8"});
+        const self = this;
 
-        // To mimick a true FS, we throw an error when file not found.
+        try
+        {
+            return this.useFakeFiles ? check(this.fakeFs.get(fileName)) : fs.readFileSync(fileName, {encoding:"utf8"});
+        }
+        catch(e)
+        {
+            this.error(e);
+            return undefined;
+        }
+
         function check(data) {
-            if(data == undefined) throw new Error('[Fake FS] File not found: ' + fileName);
+            if (data == undefined)
+            {
+                self.error('[Fake FS]', 'File not found:', fileName);
+                return undefined;
+            }
             return data;
         }
     }

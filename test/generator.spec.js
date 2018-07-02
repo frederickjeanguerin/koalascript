@@ -1,12 +1,17 @@
-const chai = require('chai');
-const expect = chai.expect;
-chai.should();
-const snapshot = require('snap-shot-it');
+const
+    chai = require('chai'),
+    expect = chai.expect,
+    snapshot = require('snap-shot-it'),
 
-const Logger = require('../src/logger');
-const log = new Logger();
-const generator = require('../src/generator');
-const gen = generator.bind(null, log);
+    Logger = require('../src/logger'),
+    log = new Logger(),
+    generator = require('../src/generator'),
+    gen = generator.bind(null, log),
+    samples = require('../src/samples'),
+
+    __end__const__ = "";
+
+chai.should();  // enable chai should syntax
 
 function parse(kcode) {
     return gen(kcode, {parseOnly:true});
@@ -83,5 +88,15 @@ describe('generator', function() {
         log.errors.length = 0;
         expect(log.hasSomeLogs).false;
     });
+
+    it("Generate map file", function() {
+        const {jscode, sourceMap} = gen(samples.kcode.helloWorld);
+        expect(log.hasSomeLogs).false;
+        expect(sourceMap.sources).eql(['default']);
+        expect(sourceMap.sourcesContent).eql([samples.kcode.helloWorld]);
+        snapshot(jscode);
+        snapshot(sourceMap);
+    });
+
 
 });

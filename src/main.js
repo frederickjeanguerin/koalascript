@@ -29,8 +29,12 @@ const
         // cmd: command line source is raw K code, not files
         { name: 'cmd', alias: 'c', type: Boolean },
 
-        // cmd: command line source is raw K code, not files
+        // checkonly: code will only be checked
         { name: 'checkonly', type: Boolean },
+
+        // noMap: by default, source maps are added to the produced code.
+        // However this can be cancelled with this options.
+        { name: 'noMap', type: Boolean },
 
         // saveConfig: save actual settings to config file, including actual arguments (except save),
         // overwriting config file if it already exists.

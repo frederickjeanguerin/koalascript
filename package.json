@@ -44,6 +44,7 @@
     "chalk": "^2.4.1",
     "command-line-args": "^5.0.2",
     "concat-stream": "^1.6.2",
+    "convert-source-map": "^1.5.1",
     "json5": "^1.0.1",
     "string-enum": "^1.2.1",
     "vm2": "^3.6.0"
