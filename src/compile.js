@@ -16,8 +16,7 @@ const
     samples         = require("./samples"),
 
     // Util functions
-    { changeExt }
-                    = require('./util'),
+    { changeExt } = require('./util-node'),
 
     // Constants
     KExt            = '.k',

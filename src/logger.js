@@ -1,7 +1,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 
-const {readAll} = require('./util');
+const {readAll} = require('./util-node');
 const globalConsole = console;
 
 class Logger {
