@@ -4,3 +4,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/frederickjeanguerin/koalascript/badge.svg?branch=master)](https://coveralls.io/github/frederickjeanguerin/koalascript?branch=master)
 
 Exploration of a new Script Language.
+
+## Todo
+
+- [ ] Add variables / constants
+- [ ] Add compile-time code checks
+- [ ] Add interpolation into JsCode
+- [ ] Embed webassembly (like JsCode)
+- [ ] Support in browser (webpack | browserify | rollup)
