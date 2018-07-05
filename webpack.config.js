@@ -5,5 +5,7 @@ module.exports = {
     output: {
         filename: '_browser.js',
         path: path.resolve(__dirname, 'src')
-    }
+    },
+    devtool: 'inline-source-map',
+    mode: "development",
 };

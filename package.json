@@ -50,5 +50,8 @@
     "json5": "^1.0.1",
     "string-enum": "^1.2.1",
     "vm2": "^3.6.0"
-  }
+  },
+  "sideEffects": [
+    "./src/browser.js"
+  ]
 }

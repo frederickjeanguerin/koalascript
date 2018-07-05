@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Klang browser test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1></h1>
+
+    <script>
+        console.log("Hello JS!");
+    </script>
+
+    <script type="text/k">
+        # output a simple message
+        $ const msg1 = "Hello inline K lang 1!"
+        $ console.log(msg1)
+        $ document.querySelector('h1').innerHTML += msg1 + "<br>"
+    </script>
+
+    <script type="text/k">
+        # output another message
+        $ const msg2 = "Hello inline K lang 2!"
+        $ console.log(msg2)
+        $ document.querySelector('h1').innerHTML += msg2 + "<br>"
+    </script>
+
+    <script type="text/k">
+        # some JS syntax error
+        $ 1 +
+    </script>
+
+    <script type="text/k">
+        # some K syntax error
+        $
+    </script>
+
+    <script src="../src/_browser.js"></script>
+</body>
+</html>

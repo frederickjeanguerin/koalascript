@@ -1,3 +1,5 @@
 __snapshots__
 build
+dist
 src/klex.js
+src/_*

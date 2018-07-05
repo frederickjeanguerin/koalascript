@@ -6,9 +6,6 @@ compile.runCode = runCode;
 compile.compileFile = compileFile;
 
 const
-    // External modules
-    convert = require('convert-source-map'),
-
     // Internal modules
     gen             = require("./generator"),
     RunJs           = require('./runjs'),
@@ -17,6 +14,7 @@ const
 
     // Util functions
     { changeExt } = require('./util-node'),
+    { sourceMapComment } = require('./util'),
 
     // Constants
     KExt            = '.k',
@@ -138,7 +136,7 @@ function compileCode(   /* istanbul ignore next */
 
     if(!noMap)
     {
-        jscode += "\n\n\n" + convert.fromObject(sourceMap).toComment();
+        jscode += "\n\n\n" + sourceMapComment(sourceMap);
     }
 
     if(targetFile === STDOUT)

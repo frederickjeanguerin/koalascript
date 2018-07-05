@@ -3,6 +3,7 @@ module.exports =
     countLines,
     countChar,
     nextPosition,
+    sourceMapComment,
 };
 
 /**
@@ -46,4 +47,12 @@ function nextPosition ( /* istanbul ignore next: type hint */
         }
     }
     return {line, col};
+}
+
+function sourceMapComment(sourceMap)
+{
+    // code coming from source-map-converter
+    const jsonMap = JSON.stringify(sourceMap);
+    const base64Map = new Buffer(jsonMap).toString('base64');
+    return '//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64Map;
 }

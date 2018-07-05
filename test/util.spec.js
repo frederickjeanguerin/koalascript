@@ -6,7 +6,10 @@ const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 
 // Tested module
-const { countLines, countChar, nextPosition } = require('../src/util');
+const { countLines, countChar, nextPosition, sourceMapComment } = require('../src/util');
+
+// Useful
+const convertSourceMap = require('convert-source-map');
 
 describe('util', function() {
 
@@ -31,6 +34,20 @@ describe('util', function() {
         expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, col:4});
         expect(nextPosition("   \n\n   ", 8, 5, 0, 0)).eql({line:0, col:3});
         expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, col:4});
+    });
+
+    it('#sourceMapComment', function() {
+        const sm = {
+            version : 3,
+            file: "out.js",
+            sourceRoot : "",
+            sources: ["foo.js", "bar.js"],
+            names: ["src", "maps", "are", "fun"],
+            mappings: "AAgBC,SAAQ,CAAEA"
+        };
+        const comment = sourceMapComment(sm);
+        const otherComment = convertSourceMap.fromObject(sm).toComment();
+        expect(comment).eq(otherComment);
     });
 
 });

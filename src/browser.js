@@ -1,5 +1,7 @@
+const {sourceMapComment} = require('./util');
 const gen = require('./generator');
 const Logger = require('./logger');
+const io = require('./io-browser');
 
 (function(window){
 
@@ -9,19 +11,23 @@ const Logger = require('./logger');
         return;
     }
 
+    console.warn("Klang module loaded : not intended for production!");
+
     const document = window.document;
 
-    const log = new Logger({options:{mute:false}});
-    for( const kscript in document.querySelectorAll('script[type="text/k"]'))
+    const log = new Logger({io});
+    const kscripts = document.querySelectorAll('script[type="text/k"]');
+    for( const [i, kscript] of kscripts.entries())
     {
-        const kcode = kscript.innerHtml;
-        const {jscode, sourceMap} = gen(log, kcode, {sourceName:"inline"});
-        var newScript = document.createElement("script");
-        var inlineScript = document.createTextNode("console.log('Script added');\n" + jscode + "\n\n" + sourceMap);
+        const kcode = kscript.innerHTML;
+        const {jscode, sourceMap} = gen(log, kcode, {sourceName: ("inline-kscript-" + i)});
+        if(!jscode) continue;
+        const newScript = document.createElement("script");
+        const inlineScript = document.createTextNode(
+            jscode + "\n\n"
+            + sourceMapComment(sourceMap));
         newScript.appendChild(inlineScript);
-        // todo insert before instead
-        // kscript.parentNode.insertBefore(newScript, kScript);
-        document.appendChild(newScript);
+        document.body.appendChild(newScript);
     }
 
 })(typeof window === "undefined" ? undefined : window);
