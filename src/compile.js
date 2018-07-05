@@ -58,14 +58,14 @@ async function compile (
         else
         {
             // if stdin is the console
-            if(log.stdin.isTTY){
+            if(log.io.acceptColors){
                 // We may lunch the repl from here, because stdin is the console...
                 // For the moment, we pass in a test program.
                 compileCode_(samples.kcode.helloFrom("fn CompileCode"), "internal-sample-program");
             }
             else
             {
-                compileCode_(await log.readStdin(), "stdin");
+                compileCode_(await log.io.readStdin(), "stdin");
             }
         }
     }
@@ -94,11 +94,14 @@ function compileFile(               /* istanbul ignore next */
 
     log.info('Compiling:', fileName, " -> ", targetName);
 
-    const kcode = log.readFile(fileName);
-
-    if (kcode)
+    try
     {
+        const kcode = log.io.readFile(fileName);
         compileCode(kcode, fileName, targetName);
+    }
+    catch(e)
+    {
+        log.error(e);
     }
 }
 
@@ -144,7 +147,7 @@ function compileCode(   /* istanbul ignore next */
     }
     else
     {
-        log.saveFile(targetFile, jscode);
+        log.io.saveFile(targetFile, jscode);
     }
 }
 compileCode.STDOUT = STDOUT;

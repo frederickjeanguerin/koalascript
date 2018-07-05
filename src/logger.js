@@ -1,46 +1,23 @@
-const fs = require('fs');
+const IoMute = require('./io-mute');
 const chalk = require('chalk');
 
-const {readAll} = require('./util-node');
-const globalConsole = console;
+module.exports = class Logger {
 
-class Logger {
-
-    constructor ({
-        // Override the followings to make the logger work with whatever streams it wants.
-        stdin = process.stdin,  // Pass a string in here to make stdin read from there.
-        stderr = process.stderr,
-        stdout = process.stdout,
-        console = globalConsole,
-
-        // If this is an Array, file content will come from these to build a fake FS.
-        // e.g. [['file1.k', 'program content 1'], ['file2.k', 'program content 2']]
-        fakeFiles = false,
-
-        options : {
+    constructor (
+        {
             // In quiet mode, info messages are not reported.
             quiet = false,
             // In debug mode, debug messages are reported, and stack traces are reported for exceptions.
             // Mode is on if debug !== null.
-            // Only messages including the debug string are reported.
+            // Only subject messages including the debug string are reported.
             debug = null,
-            // In mute mode, no output is produced (collect data only) and no files are written (fake FS is used)
-            // Since most logger are created for testing, this options is on by default.
-            mute = true,
+            // io object used. By default al io are muted (for testing purpose).
+            io = IoMute,
         } = {},
-    } = {}) {
+    ) {
 
-        this.stdin = stdin;
-        this.isStdinConsumed = false;
-        this.stderr = stderr;
-        this.stdout = stdout;
-        this.console = console;
-
-        this.useFakeFiles = !!fakeFiles;
-        this.fakeFiles = fakeFiles || [];
-        this.fakeFs = new Map(fakeFiles || []);
-
-        this.options = {quiet, debug, mute};
+        this.io = io;
+        this.options = {quiet, debug};
 
         this.errors = [];
         this.warnings = [];
@@ -48,6 +25,13 @@ class Logger {
         this.debugs = [];
         this.results = [];
     }
+
+    get isDebug() { return this.options.debug !== null; }
+    get hasErrors() { return this.errors.length > 0; }
+    get hasSomeLogs() {
+        return this.errors.length + this.warnings.length + this.results.length > 0;
+    }
+
     /**
      * Clear all logs.
      * @return {Logger} itself
@@ -58,13 +42,11 @@ class Logger {
         this.infos.length = 0;
         this.debugs.length = 0;
         this.results.length = 0;
-        this.fakeFs = new Map(this.fakeFiles || []);
-        this.isStdinConsumed = false;
+        this.io.restore();
         return this;
     }
 
     report(reportFn, colorFn, subject, ...details) {
-        if (this.options.mute) return;
 
         // Get rid of exception stacktrace if not in debug mode
         if(!this.isDebug) {
@@ -76,18 +58,19 @@ class Logger {
         }
 
         // If on terminal, output colorful messages (with the console)
-        if(this.stdout.isTTY){
+        if(this.io.acceptColors){
             // First, color all odd detail if its a string.
             for(const [i, detail] of details.entries()){
-                if(i % 2 === 1 && typeof detail === 'string')
+                if(i % 2 === 1 && typeof detail === 'string') {
                     details[i] = chalk.yellow(detail);
+                }
             }
             reportFn(colorFn(subject), ...details);
         }
 
         // Otherwise output strait messages on stderr
         else {
-            this.stderr.write( [subject, ...details].join(' ') + "\n");
+            this.io.writeStderr( [subject, ...details].join(' ') + "\n");
         }
     }
 
@@ -95,7 +78,7 @@ class Logger {
     {
         if(!this.options.quiet) {
             this.infos.push([...arguments].join(' '));
-            this.report(this.console.info, chalk.green, subject, ...details);
+            this.report(this.io.console.info, chalk.green, subject, ...details);
         }
     }
 
@@ -103,55 +86,44 @@ class Logger {
     {
         if(this.isDebug && subject.includes(this.options.debug)) {
             this.debugs.push([...arguments].join(' '));
-            this.report(this.console.log, chalk.cyan, "[Debug] " + subject + ":", ...details);
+            this.report(this.io.console.log, chalk.cyan, "[Debug] " + subject + ":", ...details);
         }
     }
 
     warn(...messages)
     {
         this.warnings.push(messages.join(' '));
-        this.report(this.console.warn, chalk.yellow, "Warning:", ...messages);
+        this.report(this.io.console.warn, chalk.yellow, "Warning:", ...messages);
     }
 
     error(...messages)
     {
         this.errors.push(messages.join(' '));
-        this.report(this.console.error, chalk.red, "Error:", ...messages);
+        this.report(this.io.console.error, chalk.red, "Error:", ...messages);
     }
 
-    get isDebug() { return this.options.debug !== null; }
-    get hasErrors() { return this.errors.length > 0; }
-    get hasSomeLogs() {
-        return this.errors.length + this.warnings.length + this.results.length
-            + (this.fakeFs.size - this.fakeFiles) > 0; }
-
-    /**
-     * Use this method to report any final compilation result on stdio.
-     * @param {any} aResult
-     */
     result( aResult )
     {
         if( this.errors.length )
         {
-            this.warn("Could not output result because there are errors:\n", aResult);
+            this.warn("Result might be invalid because of errors:\n", aResult);
             return;
         }
 
         this.results.push(aResult);
-        if(this.options.mute) return;
 
-        if( this.stdout.isTTY )
+        if( this.io.acceptColors )
         {
             if(typeof aResult === 'string')
                 aResult = chalk.blue(aResult);
-            this.console.log(aResult);
+            this.io.console.log(aResult);
         }
 
         else
         {
             // If not the first result, add a newline before
-            if (this.results.lenght) this.stdout.write("\n");
-            this.stdout.write(aResult);
+            if (this.results.lenght) this.io.writeStdout("\n");
+            this.io.writeStdout(aResult);
         }
     }
     /**
@@ -165,66 +137,5 @@ class Logger {
         return this;
     }
 
-    /**
-     * @return {string}
-     */
-    async readStdin()
-    {
-        if(this.isStdinConsumed){
-            throw new Error("Cant read stdin twice!");
-        }
-        const stdinContent =
-            (typeof this.stdin === 'string') ?
-                this.stdin :
-                await readAll(this.stdin);
-        this.isStdinConsumed = true;;
-        return stdinContent;
-    }
-
-    /**
-     * @param  {string} fileName
-     * @return {string} File content
-     */
-    readFile(fileName)
-    {
-        const self = this;
-
-        try
-        {
-            return this.useFakeFiles ? check(this.fakeFs.get(fileName)) : fs.readFileSync(fileName, {encoding:"utf8"});
-        }
-        catch(e)
-        {
-            this.error(e);
-            return undefined;
-        }
-
-        function check(data) {
-            if (data == undefined)
-            {
-                self.error('[Fake FS]', 'File not found:', fileName);
-                return undefined;
-            }
-            return data;
-        }
-    }
-    /**
-     * @param  {string} fileName
-     * @param  {string} content
-     */
-    saveFile(fileName, content)
-    {
-        if (this.options.mute)
-        {
-            this.fakeFs.set(fileName, content);
-        }
-        else
-        {
-            fs.writeFileSync(fileName, content);
-        }
-    }
 };
 
-Logger.default = new Logger({options:{mute:false}});
-
-module.exports = Logger;

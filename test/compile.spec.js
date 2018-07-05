@@ -10,11 +10,12 @@ const convertSourceMap = require('convert-source-map');
 
 // Dependents
 const Logger = require('../src/logger');
+const IoTest = require('../src/io-test');
 const samples = require('../src/samples');
 
 // Logger used throuhout the tests
-const log = new Logger({
-    stdin: "$ 10",
+const log = new Logger( {io:IoTest({
+    fakeStdin: "$ 10",
     fakeFiles:[
         ['hello.k', samples.kcode.helloWorld],
         ["hello2.k", samples.kcode.helloFrom('hello2')],
@@ -23,7 +24,7 @@ const log = new Logger({
         ["buggy-run.k", "$ throw Error('foobug')"],
         ["bad-name.bad", ""],
     ]
-});
+})});
 
 // Tested module
 const compile = require('../src/compile');
@@ -91,8 +92,7 @@ describe('compile', function() {
         it('Compilation to file', async function() {
             const targetFile = "hello.js";
             await compileCode({}, hello, "compileCodeTest" ,targetFile);
-            expect(log.fakeFs.get(targetFile)).match(/compileCodeTest/);
-            log.restore();
+            expect(log.io.fakeFs.get(targetFile)).match(/compileCodeTest/);
         });
 
         it('Check code only', async function() {
@@ -120,9 +120,8 @@ describe('compile', function() {
 
         it('Existing standard file', async function() {
             await compileFile('hello.k');
-            expect(log.fakeFs.get('hello.js')).match(/hello/i);
+            expect(log.io.fakeFs.get('hello.js')).match(/hello/i);
             expect(log.infos.pop()).match(/compiling/i);
-            log.restore();
         });
 
         it('Bad extension yield error', async function() {
@@ -144,23 +143,23 @@ describe('compile', function() {
 
         it('Compile files', async function() {
             await compile_({src:['hello.k', 'hello2.k', 'hello3.k']});
-            expect(log.fakeFs.get('hello.js')).match(/hello/i);
-            expect(log.fakeFs.get('hello2.js')).match(/hello2/i);
-            expect(log.fakeFs.get('hello3.js')).match(/hello3/i);
+            expect(log.io.fakeFs.get('hello.js')).match(/hello/i);
+            expect(log.io.fakeFs.get('hello2.js')).match(/hello2/i);
+            expect(log.io.fakeFs.get('hello3.js')).match(/hello3/i);
             expect(log.infos.length).eq(3);
             log.restore();
         });
 
         it('Compile with errors', async function() {
-            const fakeFs = log.fakeFs;
             await compile_({src:['bad-name.bad', 'buggy-parse.k']});
-            expect(log.fakeFs).eql(fakeFs);
+            expect(log.io.hasNewFiles).false;
             expect(log.errors.length).eq(2);
             log.restore();
         });
 
         it('Compile from stdin to stdout', async function() {
             await compile_({src:[]});
+            console.log(log);
             expect(log.results.pop()).match(/10/);
         });
 

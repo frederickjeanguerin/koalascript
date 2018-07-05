@@ -54,8 +54,8 @@ const
  * @param {Logger} log Logger used for logging compilation results and errors. Override for testing purpose.
  * @param {String[]} argv Arguments passed on command line. Override for testing purpose.
  */
-async function main (                           /* istanbul ignore next */
-    log = new Logger({options:{mute:false}}),   /* istanbul ignore next */
+async function main (           /* istanbul ignore next */
+    log = new Logger,           /* istanbul ignore next */
     argv = process.argv )
 {
     try

@@ -1,5 +1,9 @@
-const main = require('./main');
+const
+    main    = require('./main'),
+    io      = require("./io-node"),
+    Logger  = require("./logger");
+
 
 (async () => {
-    process.exit(await main());
+    process.exit(await main(new Logger({io})));
 })();
