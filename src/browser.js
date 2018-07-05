@@ -3,7 +3,7 @@ const gen = require('./generator');
 const Logger = require('./logger');
 const io = require('./io-browser');
 
-(function(window){
+(async function(window){
 
     if(!window)
     {
@@ -19,9 +19,44 @@ const io = require('./io-browser');
     const kscripts = document.querySelectorAll('script[type="text/k"]');
     for( const [i, kscript] of kscripts.entries())
     {
-        const kcode = kscript.innerHTML;
-        const {jscode, sourceMap} = gen(log, kcode, {sourceName: ("inline-kscript-" + i)});
+        // clear previous errors if any.
+        log.restore();
+
+        let kcode, sourceName;
+
+        if (kscript.src) // try to load source file
+        {
+            try
+            {
+                sourceName = kscript.src;
+                const response = await fetch(sourceName);
+                if (response.ok)
+                {
+                    kcode = await response.text();
+                }
+                else
+                {
+                    console.error("Can't reach: " + sourceName);
+                }
+            }
+            catch(e)
+            {
+                console.error(e);
+            }
+        }
+
+        if (!kcode) // if no src or if src failed, go for script tag content
+        {
+            kcode = kscript.innerHTML;
+            sourceName = "inline-kscript-" + i;
+        }
+
+        if(!kcode) continue;
+
+        const {jscode, sourceMap} = gen(log, kcode, {sourceName});
+
         if(!jscode) continue;
+
         const newScript = document.createElement("script");
         const inlineScript = document.createTextNode(
             jscode + "\n\n"

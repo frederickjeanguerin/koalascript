@@ -37,6 +37,22 @@
         $
     </script>
 
+    <!-- Load and run a K file -->
+    <script type="text/k" src="basic.k"></script>
+
+    <!-- Bad local source -->
+    <script type="text/k" src="basic.kk"></script>
+
+    <!-- Bad external source -->
+    <script type="text/k" src="http://unknown-domain/basic.k"></script>
+
+    <!-- Bad local source with replacement code -->
+    <script type="text/k" src="unreachable.k">
+        $ console.info("Unloaded file replaced by this log!")
+    </script>
+
+    <!-- The klang library must be included at the end (or deferred) -->
+    <!-- Otherwise it cant see the unparsed script tags coming after -->
     <script src="../src/_browser.js"></script>
 </body>
 </html>

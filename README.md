@@ -11,4 +11,6 @@ Exploration of a new Script Language.
 - [ ] Add compile-time code checks
 - [ ] Add interpolation into JsCode
 - [ ] Embed webassembly (like JsCode)
-- [ ] Support in browser (webpack | browserify | rollup)
+- [x] Support in browser (webpack | browserify | rollup)
+    - [ ] Error log not pointing to the error, but the logging code -> ??
+    - [ ] Bundle is VERY big -> should be reduced

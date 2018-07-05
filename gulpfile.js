@@ -13,17 +13,7 @@ task('default', ['clean'], function() {
 });
 
 task('build', ['nearley'], function() {
-    // return gulp.start('nearley');
-    // return gulp.src('src/**/*.js')
-    // .pipe(jshint('.jshintrc'))
-    // .pipe(jshint.reporter('default'))
-    // .pipe(concat('main.js'))
-    // .pipe(gulp.dest('build/'))
-    // .pipe(rename({suffix: '.min'}))
-    // .pipe(uglify())
-    // .pipe(gulp.dest('dist/assets/js'))
-    // .pipe(notify({ message: 'Scripts task complete' }))
-    // ;
+    gulp.start('pack');
 });
 
 task('nearley', () =>
@@ -39,9 +29,10 @@ task('clean', function() {
     return del(['src/_*', 'samples/*.js', 'coverage/**', '.nyc_output/**', 'temp/**']);
 });
 
+task('pack', ['nearley'], run('npx webpack'));
+
 task('delete-snapshots', function(){
     return del(['__snapshots__/**']);
 });
 
 task('update-snapshots', ['delete-snapshots'], run('mocha'));
-
