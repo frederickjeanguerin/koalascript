@@ -159,7 +159,6 @@ describe('compile', function() {
 
         it('Compile from stdin to stdout', async function() {
             await compile_({src:[]});
-            console.log(log);
             expect(log.results.pop()).match(/10/);
         });
 
