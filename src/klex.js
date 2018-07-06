@@ -5,16 +5,11 @@ const
     Lexer = require('./lexer'),
     LexerNearley = require('./lexer-nearley'),
     Token = require('./token'),
-    StringEnum = require('string-enum');
-
-/**
- * @type {Object<string,string>}
- */
-const tokenTypes = StringEnum('js_line', 'unmatched_char');
+    tt = require('./token-types');
 
 const lexer = new Lexer()
     .setUseUnicode(true)
-    .setUnmatchedCharFn((match) => newToken(tokenTypes.unmatched_char, match))
+    .setUnmatchedCharFn((match) => newToken(tt.unmatched_char, match))
     .addDefinitions(
         ['S', /\p{Zs}|\t/],         // SPACE
         ['N', /\n\r?|\r\n?/],       // NEWLINE
@@ -25,7 +20,7 @@ const lexer = new Lexer()
 
         // JS line statement
         [ /[$]@S+@@ANYTHING/, function (match = Lexer.Actions()) {
-            return newToken (tokenTypes.js_line, match, match.info.groups.ANYTHING);
+            return newToken (tt.js_line, match, match.info.groups.ANYTHING);
         }],
 
         // End of line comment
@@ -56,4 +51,4 @@ function newToken(
 
 
 module.exports = new LexerNearley(
-    lexer, tokenTypes, (token) => token instanceof Token, (token, source) => token.getMessage(source));
+    lexer, tt, (token) => token instanceof Token, (token, source) => token.getMessage(source));
