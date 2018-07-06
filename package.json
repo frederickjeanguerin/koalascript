@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/frederickjeanguerin/koalascript#readme",
   "devDependencies": {
+    "acorn": "^5.7.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.1",
@@ -48,6 +49,7 @@
     "command-line-args": "^5.0.2",
     "concat-stream": "^1.6.2",
     "convert-source-map": "^1.5.1",
+    "escodegen": "^1.10.0",
     "json5": "^1.0.1",
     "string-enum": "^1.2.1",
     "vm2": "^3.6.0"

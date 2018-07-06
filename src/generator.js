@@ -6,9 +6,11 @@ const
     kparse = require('./kparse'),
     tt = require('./token-types'),
 
+    acorn = require("acorn"),
     // Babel parser and generator
-    {parse : jsparse} = require("@babel/parser"),
-    {default: jsgenerate} = require("babel-generator"),
+    // {parse : jsparse} = require("@babel/parser"),
+    // {default: jsgenerate} = require("babel-generator"),
+    escodegen = require('escodegen'),
     babelCodeFrame = require("babel-code-frame"),
 
     ____end_const = undefined;
@@ -64,8 +66,13 @@ function emit(              /* istanbul ignore next: type hint */
                 throw Error(`Unrecognized token type '${token.type}'`);
         }
     }
-    const {code : jscode, map : sourceMap} = jsgenerate({type:"Program", body}, {sourceMaps: true}, sources);
-    return {jscode, sourceMap};
+
+    const ast = {type:"Program", body};
+    const {code : jscode, map : sourceMap} = escodegen.generate(ast, {
+        sourceMap: sourceName, sourceContent: kcode, sourceMapWithCode: true });
+    return {jscode, sourceMap: JSON.parse(sourceMap.toString())};
+
+    // ------ Functions -----------
 
     function js_line(token = new Token())
     {
@@ -73,16 +80,23 @@ function emit(              /* istanbul ignore next: type hint */
         const source = "\n".repeat(token.line - 1) + " ".repeat(token.col) + token.text.slice(1);
         sources[sourceName] = kcode;
         try {
-            const ast = jsparse(source, {
-                sourceFilename: sourceName,
-            });
-            body.push(...ast.program.body);
+            const ast = jsparse(source, sourceName);
+            body.push(...ast.body);
         } catch (err) {
             // syntax error
             const {loc, message } = err;
             log.error(message, "\n" + babelCodeFrame(kcode, loc.line, loc.column + 1));
         }
     }
+}
+
+function jsparse (jscode, sourceFile) {
+    return acorn.parse(jscode, {
+        ecmaVersion: 2018,
+        sourceType: "script",
+        locations:true,
+        sourceFile,
+    });
 }
 
 module.exports = gen;
