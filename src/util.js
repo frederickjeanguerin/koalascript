@@ -11,7 +11,10 @@ module.exports =
  * @returns {number} Number of lines of text (new line + 1)
  */
 function countLines(text) {
-    return countChar(text, '\n') + 1;
+    const nbNewLine = countChar(text, '\n')
+    if (nbNewLine > 0) return nbNewLine + 1;
+    else if(text.trim() === "") return 0
+    else return 1;
 }
 
 /**
@@ -53,6 +56,6 @@ function sourceMapComment(sourceMap)
 {
     // code coming from source-map-converter
     const jsonMap = JSON.stringify(sourceMap);
-    const base64Map = new Buffer(jsonMap).toString('base64');
+    const base64Map = new Buffer.from(jsonMap).toString('base64');
     return '//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64Map;
 }

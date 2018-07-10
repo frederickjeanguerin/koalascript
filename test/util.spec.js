@@ -20,7 +20,8 @@ describe('util', function() {
     });
 
     it('#countLines', function() {
-        countLines("").should.eq(1);
+        countLines("").should.eq(0);
+        countLines("at Context.<anonymous> (C:\\Users\\fguerin\\source\\repos\\Koalalang\\test\\sys-error.spec.js:25:21)").should.eq(1);
         countLines("  aa ").should.eq(1);
         countLines(" \n ").should.eq(2);
         countLines("\n aa \n\n\n bb \n").should.eq(6);

@@ -2,14 +2,14 @@ const chai = require('chai')
 chai.should()
 
 const {checkSyntax} = require('../src/jscheck')
-const {KSyntaxError} = require('../src/kerror')
+const SysSyntaxError = require('../src/sys-syntax-error')
 
 describe('checkjs', function() {
 
     it('#checkSyntax', function() {
         checkSyntax("").should.be.false
         checkSyntax("1 + 2").should.be.false
-        checkSyntax("1 +").should.be.instanceOf(KSyntaxError)
+        checkSyntax("1 +").should.be.instanceOf(SysSyntaxError)
         checkSyntax("1 +").line.should.eq(1)
         checkSyntax("\n1 +").line.should.eq(2)
         checkSyntax("1 +").column.should.eq(3)
