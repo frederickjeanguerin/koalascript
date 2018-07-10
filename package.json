@@ -54,6 +54,7 @@
     "js-tokens": "^4.0.0",
     "json5": "^1.0.1",
     "path-parse": "^1.0.5",
+    "source-map": "^0.7.3",
     "string-enum": "^1.2.1",
     "vm2": "^3.6.0"
   },

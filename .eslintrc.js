@@ -25,10 +25,10 @@ module.exports = {
         //     "error",
         //     "double"
         // ],
-        "semi": [
-            "error",
-            "always"
-        ],
+        // "semi": [
+        //     "error",
+        //     "always"
+        // ],
         'no-console': 'off',
         'no-extra-semi': 'off',
         'no-unused-vars': [
