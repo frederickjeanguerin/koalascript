@@ -1,4 +1,4 @@
-module.exports = { checkSyntax, assertSyntax };
+module.exports = { throwsSyntax, assertSyntax };
 
 const vm = require('vm')
 const assert = require('./sys-assert')
@@ -21,7 +21,7 @@ function assertSyntax(jscode, sourceName, lineOffset = 0, columnOffset = 0)
     }
 }
 
-function checkSyntax(jscode, sourceName, lineOffset, columnOffset)
+function throwsSyntax(jscode, sourceName, lineOffset, columnOffset)
 {
     try
     {
