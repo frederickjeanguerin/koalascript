@@ -13,14 +13,17 @@ const lexer = new Lexer()
     .addDefinitions(
         ['S', /\p{Zs}|\t/],         // SPACE
         ['N', /\n\r?|\r\n?/],       // NEWLINE
+        ['SPACES', /[\s\t]+/],      // Not working...
         ['ANYTHING', /.*/],
         ['SOMETHING', /\S.*/],
     )
     .addRules (
 
         // JS line statement
-        [ /[$]@S+@@ANYTHING/, function (match = Lexer.Actions()) {
-            return newToken (tt.js_line, match, match.info.groups.ANYTHING);
+        [ /[$](?<spaces>@S+)(?<jscode>.+)/, function (match = Lexer.Actions()) {
+            const offset = match.info.groups.spaces.length + 1;
+            const jscode = match.info.groups.jscode;
+            return newToken (tt.js_line, match, {jscode, offset});
         }],
 
         // End of line comment

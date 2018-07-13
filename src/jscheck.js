@@ -1,14 +1,15 @@
-module.exports = { throwsSyntax, assertSyntax };
+module.exports = checkSyntax;
 
 const vm = require('vm')
 const assert = require('./sys-assert')
 const SysSyntaxError = require('./sys-syntax-error')
 
-function assertSyntax(jscode, sourceName, lineOffset = 0, columnOffset = 0)
+function checkSyntax(jscode, sourceName, lineOffset = 0, columnOffset = 0)
 {
     try
     {
         new vm.Script(jscode, {filename:"filename"})
+        return false;
     }
     catch(err)
     {
@@ -17,20 +18,8 @@ function assertSyntax(jscode, sourceName, lineOffset = 0, columnOffset = 0)
         void length
         line = +line + lineOffset;
         const column = indent.length + (lineOffset > 0 ? 0 : columnOffset)
-        throw new SysSyntaxError(err.message, sourceName, line, column + 1)
+        return new SysSyntaxError(err.message, sourceName, line, column + 1)
     }
 }
 
-function throwsSyntax(jscode, sourceName, lineOffset, columnOffset)
-{
-    try
-    {
-        assertSyntax(jscode, sourceName, lineOffset, columnOffset)
-        return false;
-    }
-    catch(err)
-    {
-        return err;
-    }
-}
 

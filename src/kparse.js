@@ -14,9 +14,7 @@ const
 module.exports = function kparse(       /* istanbul ignore next: type hint */
     log = new Logger(),                 /* istanbul ignore next: type hint */
     kcode = "",
-    {selfContained = true}={})
-{
-    void selfContained; // unused for now
+) {
 
     let parsing;
     main : {

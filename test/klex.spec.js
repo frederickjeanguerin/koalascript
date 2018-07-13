@@ -41,7 +41,7 @@ describe('klex', function() {
         expect(tokens[0].type).eq(TT.js_line);
         expect(tokens[0].text).eq(jsstmt);
         expect(tokens[0].index).eq(2);
-        expect(tokens[0].info).eq(jscode);
+        expect(tokens[0].info.jscode).eq(jscode);
     });
 
     it('Unexpected characters should lex an error token', function() {

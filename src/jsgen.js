@@ -2,15 +2,21 @@ module.exports = jsgen;
 
 const {default:jsTokens} = require("js-tokens");
 const {SourceNode} = require('source-map');
-const {throwsSyntax} = require('./jscheck');
-
-
-function jsgen (jscode, sourceName, lineOffset = 0, columnOffset = 0)
+const checkSyntax = require('./jscheck');
+/**
+ * Generate the source nodes for the given JS code.
+ * If there is a JS syntax error, throws that error.
+ *
+ * @param  {string} jscode
+ * @param  {string} sourceName
+ * @param  {int} lineOffset
+ * @param  {int} columnOffset
+ * @returns {SourceNode}
+ */
+function jsgen (jscode, sourceName, lineOffset, columnOffset)
 {
-    if(throwsSyntax(jscode))
-    {
-        throw new TypeError("js code should be valid here");
-    }
+    const error = checkSyntax(jscode);
+    if(error) throw error;
 
     const tokens = jscode.match(jsTokens);
 

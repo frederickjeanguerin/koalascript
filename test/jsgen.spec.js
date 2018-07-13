@@ -2,7 +2,7 @@ const chai = require('chai')
 chai.should()
 
 const jsgen = require('../src/jsgen')
-var deepEqual = require('deep-equal')
+// var deepEqual = require('deep-equal')
 
 const jsprogram = `
     // a simple JS program

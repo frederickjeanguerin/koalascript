@@ -7,7 +7,7 @@ compile.compileFile = compileFile;
 
 const
     // Internal modules
-    gen             = require("./generator"),
+    kgen             = require("./kgen"),
     RunJs           = require('./runjs'),
     Logger          = require("./logger"),
     samples         = require("./samples"),
@@ -118,7 +118,7 @@ function compileCode(   /* istanbul ignore next */
         return;
     }
 
-    let { jscode, sourceMap } = gen(log, kcode, {sourceName});
+    let { jscode, jsonMap } = kgen(log, kcode, {sourceName});
 
     if (log.hasErrors) return;
 
@@ -136,7 +136,7 @@ function compileCode(   /* istanbul ignore next */
 
     if(!noMap)
     {
-        jscode += "\n\n\n" + sourceMapComment(sourceMap);
+        jscode += "\n\n\n" + sourceMapComment(jsonMap);
     }
 
     if(targetFile === STDOUT)

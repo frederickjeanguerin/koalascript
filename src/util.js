@@ -55,7 +55,11 @@ function nextPosition ( /* istanbul ignore next: type hint */
 function sourceMapComment(sourceMap)
 {
     // code coming from source-map-converter
-    const jsonMap = JSON.stringify(sourceMap);
+    if( typeof sourceMap === "object")
+    {
+        sourceMap = JSON.stringify(sourceMap);
+    }
+    const jsonMap = sourceMap;
     const base64Map = new Buffer.from(jsonMap).toString('base64');
     return '//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64Map;
 }

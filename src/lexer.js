@@ -94,7 +94,7 @@ Lexer.prototype.clear = function () {
 /**
  * Set ignore case mode.
  *
- * By default it is case sensitie.
+ * By default it is case sensitive.
  *
  * @param {boolean} ignoreCase
  * @returns {Lexer}

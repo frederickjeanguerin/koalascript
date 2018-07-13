@@ -1,4 +1,4 @@
-const {checkSyntax} = require('./jscheck');
+const checkSyntax = require('./jscheck');
 
 var stmts = [
     "console.log(10)",
