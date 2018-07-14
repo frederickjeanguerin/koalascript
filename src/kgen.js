@@ -21,17 +21,17 @@ function gen(               /* istanbul ignore next: type hint */
     kcode = "",
     { selfContained = true, parseOnly = false, sourceName = "default" } = {})
 {
-    let jscode, jsonMap, errors;
+    let jscode, jsonSourceMap, errors;
     const parsing = kparse(log, kcode, {selfContained});
 
     if( parsing != undefined && !(parseOnly || log.hasErrors) ) {
-        ({jscode, jsonMap, errors} = emit(parsing, kcode, sourceName));
+        ({jscode, jsonSourceMap, errors} = emit(parsing, kcode, sourceName));
         for(const error of errors) {
             log.error(error.message);
         }
     }
 
 
-    return {parsing, jscode, jsonMap};
+    return {parsing, jscode, jsonSourceMap};
 }
 

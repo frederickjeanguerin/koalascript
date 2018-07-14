@@ -48,7 +48,7 @@ function emit(              /* istanbul ignore next: type hint */
 
     return {
         jscode: code,
-        jsonMap: map.toString(),
+        jsonSourceMap: map.toString(),
         errors
     };
 
@@ -56,7 +56,6 @@ function emit(              /* istanbul ignore next: type hint */
 
     function js_line(token = new Token)
     {
-        // We parse/generate the JS for the code that follows the initial '$'
         return jsgen(token.info.jscode, sourceName, token.line, token.col + token.info.offset);
     }
 }

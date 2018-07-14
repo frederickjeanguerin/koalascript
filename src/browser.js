@@ -1,5 +1,5 @@
 const {sourceMapComment} = require('./util');
-const gen = require('./generator');
+const kgen = require('./kgen');
 const Logger = require('./logger');
 const io = require('./io-browser');
 
@@ -53,14 +53,14 @@ const io = require('./io-browser');
 
         if(!kcode) continue;
 
-        const {jscode, sourceMap} = gen(log, kcode, {sourceName});
+        const {jscode, jsonSourceMap} = kgen(log, kcode, {sourceName});
 
         if(!jscode) continue;
 
         const newScript = document.createElement("script");
         const inlineScript = document.createTextNode(
             jscode + "\n\n"
-            + sourceMapComment(sourceMap));
+            + sourceMapComment(jsonSourceMap));
         newScript.appendChild(inlineScript);
         document.body.appendChild(newScript);
     }

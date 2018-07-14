@@ -9,21 +9,20 @@ const checkSyntax = require('./jscheck');
  *
  * @param  {string} jscode
  * @param  {string} sourceName
- * @param  {int} lineOffset
- * @param  {int} columnOffset
+ * @param  {int} jscodeLine
+ * @param  {int} jscodeColumn
  * @returns {SourceNode}
  */
-function jsgen (jscode, sourceName, lineOffset, columnOffset)
+function jsgen (jscode, sourceName, jscodeLine, jscodeColumn)
 {
-    const error = checkSyntax(jscode);
-    if(error) throw error;
+    checkSyntax(jscode, {sourceName, jscodeLine, jscodeColumn, throws: true});
 
     const tokens = jscode.match(jsTokens);
 
     const pos =
     {
-        line: lineOffset,
-        column: columnOffset
+        line: jscodeLine,
+        column: jscodeColumn
     }
 
     const jsnode = new SourceNode(pos.line, pos.column, sourceName);

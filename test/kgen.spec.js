@@ -99,8 +99,8 @@ describe('kgen', function() {
     });
 
     it("Generate map file", function() {
-        const {jscode, jsonMap} = gen(samples.kcode.helloWorld);
-        const sourceMap = JSON.parse(jsonMap);
+        const {jscode, jsonSourceMap} = gen(samples.kcode.helloWorld);
+        const sourceMap = JSON.parse(jsonSourceMap);
         expect(log.hasSomeLogs).false;
         expect(sourceMap.sources).eql(['default']);
         expect(sourceMap.sourcesContent).eql([samples.kcode.helloWorld]);

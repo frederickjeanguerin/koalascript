@@ -38,18 +38,18 @@ function nextPosition ( /* istanbul ignore next: type hint */
     nextOffset = 0,     /* istanbul ignore next: type hint */
     prevOffset = 0,     /* istanbul ignore next: type hint */
     prevLine = 1,       /* istanbul ignore next: type hint */
-    prevCol = 0,
+    prevColumn = 0,
 ) {
-    let line = prevLine, col = prevCol;
+    let line = prevLine, column = prevColumn;
     for( let offset = prevOffset; offset < nextOffset; offset++ ) {
         if(code[offset] === "\n") {
-            col = 0;
+            column = 0;
             line ++;
         } else {
-            col ++;
+            column ++;
         }
     }
-    return {line, col};
+    return {line, column};
 }
 
 function sourceMapComment(sourceMap)

@@ -641,18 +641,18 @@ Lexer.prototype.expandDefinitions = function (source) {
 
 Lexer.prototype.resetIndex = function(offset = 0)
 {
-    const {line, col} = nextPosition(this.source, offset, 0, 1, 0);
+    const {line, column} = nextPosition(this.source, offset, 0, 1, 0);
     this.index = offset;
     this.line = line;
-    this.col = col;
+    this.column = column;
 };
 
 Lexer.prototype.advanceIndex = function(offset = 1)
 {
-    const {line, col} = nextPosition(this.source, this.index + offset, this.index, this.line, this.col);
+    const {line, column} = nextPosition(this.source, this.index + offset, this.index, this.line, this.column);
     this.index = this.index + offset;
     this.line = line;
-    this.col = col;
+    this.column = column;
 };
 
 /**
@@ -760,9 +760,9 @@ function Actions(lexer = new Lexer)
             return lexer.line;
         },
 
-        get col ()
+        get column ()
         {
-            return lexer.col;
+            return lexer.column;
         },
 
         get info ()

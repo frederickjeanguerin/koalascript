@@ -118,7 +118,7 @@ function compileCode(   /* istanbul ignore next */
         return;
     }
 
-    let { jscode, jsonMap } = kgen(log, kcode, {sourceName});
+    let { jscode, jsonSourceMap } = kgen(log, kcode, {sourceName});
 
     if (log.hasErrors) return;
 
@@ -136,7 +136,7 @@ function compileCode(   /* istanbul ignore next */
 
     if(!noMap)
     {
-        jscode += "\n\n\n" + sourceMapComment(jsonMap);
+        jscode += "\n\n\n" + sourceMapComment(jsonSourceMap);
     }
 
     if(targetFile === STDOUT)

@@ -22,7 +22,7 @@ const lexer = new Lexer()
         // JS line statement
         [ /[$](?<spaces>@S+)(?<jscode>.+)/, function (match = Lexer.Actions()) {
             const offset = match.info.groups.spaces.length + 1;
-            const jscode = match.info.groups.jscode;
+            const jscode = match.info.groups.jscode.trimEnd();
             return newToken (tt.js_line, match, {jscode, offset});
         }],
 
@@ -47,7 +47,7 @@ function newToken(
         match.text,
         match.index,
         match.line,
-        match.col,
+        match.column,
         info,
     );
 }

@@ -16,6 +16,7 @@ function sysAssert(condition, template, infos, stackTraceUpToFn = sysAssert)
     {
         throw new SysAssertionError(stackTraceUpToFn, template, infos)
     }
+    return condition;
 }
 
 sysAssert.eq = function (expected, given)

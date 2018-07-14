@@ -6,18 +6,32 @@ const SysSyntaxError = require('../src/sys-syntax-error')
 
 describe('jscheck', function() {
 
-    it('#checkSyntax', function() {
-        checkSyntax("").should.be.false
-        checkSyntax("1 + 2").should.be.false
-        checkSyntax("1 +").should.be.instanceOf(SysSyntaxError)
-        checkSyntax("1 +").line.should.eq(1)
-        checkSyntax("\n1 +").line.should.eq(2)
-        checkSyntax("1 +").column.should.eq(3)
-        checkSyntax("1 +").message.should.match(/unexpected end of input/i)
-        checkSyntax("1 +", "mySource").sourceName.should.eq("mySource")
-        checkSyntax("1 +", "mySource", 100).line.should.eq(101)
-        checkSyntax("1 +", "mySource", 0, 200).column.should.eq(203)
-        checkSyntax("1 +", "mySource", 100, 200).column.should.eq(3)
+    it('inNode', function() {
+        checkSyntaxAssumeBrowser(false);
     });
 
+    it('inBrowser', function() {
+        checkSyntaxAssumeBrowser(true);
+    });
+
+    it('throwsOnDemand', function() {
+        const throws = true;
+        (() => checkSyntax("", {throws})).should.not.throw;
+        (() => checkSyntax("+", {throws})).should.throw(SysSyntaxError);
+    });
+
+    function checkSyntaxAssumeBrowser(assumeBrowser) {
+        checkSyntax("", {assumeBrowser}).should.be.false
+        checkSyntax("1 + 2", {assumeBrowser}).should.be.false
+        checkSyntax("1 +", {assumeBrowser}).should.be.instanceOf(SysSyntaxError)
+        checkSyntax("1 +",{assumeBrowser}).position.should.eql({line:1, column:3})
+        checkSyntax("\n1 +   ",{assumeBrowser}).position.should.eql({line:2, column:3})
+        checkSyntax("1 +",{assumeBrowser}).message.should.match(/unexpected end of input/i)
+        checkSyntax("1 +", {assumeBrowser, sourceName: "mySource"}).sourceName.should.eq("mySource")
+        checkSyntax("1 +", {assumeBrowser, jscodeLine:100}).position.should.eql({line:100, column:3})
+        checkSyntax("1 +", {assumeBrowser, jscodeColumn:200}).position.should.eql({line:1, column:203})
+        checkSyntax("1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:100, column:203})
+        checkSyntax("\n\n1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:102, column:3})
+        checkSyntax("\n ) \n1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:101, column:2})
+    }
 });

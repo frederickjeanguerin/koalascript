@@ -28,13 +28,14 @@ describe('util', function() {
     });
 
     it('#nextPosition', function() {
-        expect(nextPosition()).eql({line:1, col:0});
-        expect(nextPosition(" ")).eql({line:1, col:0});
-        expect(nextPosition("   ", 3)).eql({line:1, col:3});
-        expect(nextPosition("   \n\n   ", 8)).eql({line:3, col:3});
-        expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, col:3});
-        expect(nextPosition("   \n\n   ", 8, 5, 0, 0)).eql({line:0, col:3});
-        expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, col:3});
+        expect(nextPosition()).eql({line:1, column:0});
+        expect(nextPosition(" ")).eql({line:1, column:0});
+        expect(nextPosition("   ", 3)).eql({line:1, column:3});
+        expect(nextPosition("   \n\n   ", 8)).eql({line:3, column:3});
+        expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, column:3});
+        expect(nextPosition("   \n\n   ", 8, 5, 0, 0)).eql({line:0, column:3});
+        expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, column:3});
+        expect(nextPosition(" ", 1, 0, 10, 20)).eql({line:10, column:21});
     });
 
     it('#sourceMapComment', function() {
