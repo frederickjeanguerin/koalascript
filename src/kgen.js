@@ -1,37 +1,23 @@
-module.exports = gen;
+module.exports = kgen;
 
 const
-    Logger = require("./logger"),
     kparse = require('./kparse'),
     emit = require('./emit'),
 
     ____end_const = undefined;
 
-/**
- * Generates Javascript code for the given kcode.
- * This code is expected to be selfContained by default,
- * wich means that it should be complete by itself.
- * If more code might come in later on the next call, set selfContained to false,
- * for example with a REPL. In this case, if the code is incomplete,
- * it will return nothing and no errors.
- */
-
-function gen(               /* istanbul ignore next: type hint */
-    log = new Logger,       /* istanbul ignore next: type hint */
-    kcode = "",
-    { selfContained = true, parseOnly = false, sourceName = "default" } = {})
+function kgen( kcode, { parseOnly = false, sourceName = "kgen" } = {})
 {
-    let jscode, jsonSourceMap, errors;
-    const parsing = kparse(log, kcode, {selfContained});
+    let jscode, jsonSourceMap, emitErrors = [];
 
-    if( parsing != undefined && !(parseOnly || log.hasErrors) ) {
-        ({jscode, jsonSourceMap, errors} = emit(parsing, kcode, sourceName));
-        for(const error of errors) {
-            log.error(error.message);
-        }
+    const { parsing, errors } = kparse(kcode, sourceName);
+
+    if( !errors.length && !parseOnly ) {
+        ({jscode, jsonSourceMap, errors: emitErrors} = emit(parsing, kcode, sourceName));
     }
 
+    errors.push(...emitErrors)
 
-    return {parsing, jscode, jsonSourceMap};
+    return {parsing, jscode, jsonSourceMap, errors};
 }
 

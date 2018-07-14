@@ -1,8 +1,10 @@
+module.exports = kparse;
+
 const
     nearley = require("nearley"),
 
     grammar = require("./_grammar"),
-    Logger = require("./logger"),
+    sys = require("./sys"),
 
     // Create a Parser object from grammar.
     kparser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar)),
@@ -10,57 +12,28 @@ const
     // Save initial parser state to reset it
     init_state = kparser.save();
 
-
-module.exports = function kparse(       /* istanbul ignore next: type hint */
-    log = new Logger(),                 /* istanbul ignore next: type hint */
-    kcode = "",
-) {
-
-    let parsing;
-    main : {
-        // Parse the code from parser
-        try
-        {
-            kparser.feed(kcode);
-        }
-        catch(err)  // Unexpected token
-        {
-            if(!err.token) throw err;
-            log.error("Unexpected token", err.token.getMessage(kcode));
-            break main;
-        }
-
-        // Get all possible parse trees
+function kparse( kcode, sourceName = "kparse")
+{
+    kparser.restore(init_state);
+    let parsing, errors = [];
+    try
+    {
+        kparser.feed(kcode);
         const parsings = kparser.results;
 
-        // We assume parsings array contains at least 1 parsing.
-        // because even if there is nothing to parse, an empty parse tree will be returned.
-        console.assert(parsings.length >= 0, parsings);
-
-        /* istanbul ignore if : grammar should not be ambiguous */
-
-        // If many parsings, the grammar is ambiguous
-        // Output some debug info before continuing the process.
-        if(parsings.length > 1)
-        {
-            let warning = ["Warning: Ambiguous grammar\n"];
-            for(const [parsing, i] of parsings.entries())
-            {
-                warning.push(i);
-                warning.push(":");
-                warning.push(parsing);
-                warning.push("\n");
-            }
-            warning.push(">>> Continuing with only the first one.\n");
-            log.warn(warning);
-        }
+        sys.assert(parsings.length === 1, "Grammar is possibly ambiguous", {parsings});
 
         // We concentrate on the first parsing only.
-        // Actually this parsing contains a sequence of statements.
+        // Actually this parsing contains the sequence of statements.
         parsing = parsings[0];
 
+        sys.assert(parsing instanceof Array)
+    }
+    catch(err)
+    {
+        if(!err.token) throw err;
+        errors.push(new sys.SyntaxError("Unexpected token " + err.token.text, sourceName, err.token.line, err.token.column + 1))
     }
 
-    kparser.restore(init_state);
-    return parsing;
+    return { parsing, errors };
 };

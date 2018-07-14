@@ -55,7 +55,7 @@ describe('klex', function() {
             type: TT.unmatched_char,
             text: unmatchedChar,
             index: 2,
-            col: 2,
+            column: 2,
             line: 1,
             info: undefined
         });

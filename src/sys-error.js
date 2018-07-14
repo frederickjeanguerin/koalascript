@@ -3,6 +3,12 @@ const pathParse = require('path-parse');
 
 class SysError extends Error
 {
+    /**
+     * Arguments can be mixed up and all are optionals.
+     * @param  {Function} stackTraceUpToFn
+     * @param  {String} template
+     * @param  {Object} infos
+     */
     constructor(stackTraceUpToFn, template, infos)
     {
         stackTraceUpToFn = SysError;

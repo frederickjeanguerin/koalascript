@@ -3,10 +3,7 @@ const
     expect = chai.expect,
     snapshot = require('snap-shot-it'),
 
-    Logger = require('../src/logger'),
-    log = new Logger(),
-    kgen = require('../src/kgen'),
-    gen = kgen.bind(null, log),
+    gen = require('../src/kgen'),
     samples = require('../src/samples'),
 
     __end__const__ = "";
@@ -19,41 +16,30 @@ function parse(kcode) {
 
 describe('kgen', function() {
 
-    afterEach(() => {
-        log.restore();
-    });
-
     it('Empty and comment', function() {
         expect(gen("").jscode).eq("");
         expect(gen("  \n  \n ").jscode).eq("");
         expect(gen("  # comment\n  # comment\n ").jscode).eq("");
-        expect(log.hasSomeLogs).false;
     });
 
     it('JS line', function() {
         expect(gen("$ 10").jscode).eq("10;");
         expect(gen("$ 10\n $ 20").jscode).eq("10;20;");
         expect(gen("$ console.log(99)").jscode).eq("console.log(99);");
-        expect(log.hasSomeLogs).false;
     });
 
     it('Some single parse errors', function() {
-        gen("$");
-        expect(log.hasErrors).true;
-        expect(log.errors.length).eq(1);
-        expect(log.errors.pop()).match(/Unexpected/).match(/\$/);
+        let {errors} = gen("$");
+        expect(errors.length).eq(1);
+        expect(errors[0].toString()).match(/Unexpected/).match(/\$/);
 
-        gen("$ ");
-        expect(log.hasErrors).true;
-        expect(log.errors.length).eq(1);
-        expect(log.errors.pop()).match(/Unexpected/).match(/\$/);
+        ({errors} = gen("$ "));
+        expect(errors.length).eq(1);
+        expect(errors[0].toString()).match(/Unexpected/).match(/\$/);
 
-        gen(")");
-        expect(log.hasErrors).true;
-        expect(log.errors.length).eq(1);
-        expect(log.errors.pop()).match(/Unexpected/).match(/\)/);
-
-        expect(log.hasSomeLogs).false;
+        ({errors} = gen(") "));
+        expect(errors.length).eq(1);
+        expect(errors[0].toString()).match(/Unexpected/).match(/\)/);
     });
 
     it('Parse only mode', function() {
@@ -62,17 +48,14 @@ describe('kgen', function() {
         expect(jscode).undefined;
         expect(parsing).has.property('length', 3);
         expect(parsing[0]).has.property('type', "js_line");
-        expect(log.hasSomeLogs).false;
     });
 
     it('Detect and report inline JS errors', function() {
         const singleLineWithJsSyntaxError = `$ 1 + ) +`;
-        gen(singleLineWithJsSyntaxError);
-        expect(log.hasErrors).true;
-        expect(log.errors.length).eq(1);
-        const errorMessage = log.errors.pop();
+        let {errors} = gen(singleLineWithJsSyntaxError);
+        expect(errors.length).eq(1);
+        let errorMessage = errors[0].toString();
         expect(errorMessage).match(/unexpected/i).match(/\)/);
-        expect(log.hasSomeLogs).false;
 
         // Reports JS syntax errors in a meaningfull way.
         snapshot(errorMessage);
@@ -82,32 +65,26 @@ describe('kgen', function() {
         $ 1 + ) +
         # somme comment after
         `;
-        gen(multilineWithJsSyntaxError);
-        snapshot(log.errors.pop());
-        expect(log.hasSomeLogs).false;
+        ({errors} = gen(multilineWithJsSyntaxError));
+        expect(errors.length).eq(1);
+        snapshot(errors[0].toString());
     });
 
     it("Reports many JS errors from many JS statements", function() {
-        gen(`
+        let {errors} = gen(`
         $ 1 + ) +
         $ 1 + ) +
         $ 1 + ) +
         `);
-        expect(log.errors.length).eq(3);
-        log.errors.length = 0;
-        expect(log.hasSomeLogs).false;
+        expect(errors.length).eq(3);
+        errors.forEach(err => expect(err.toString()).match(/\)/));
     });
 
     it("Generate map file", function() {
         const {jscode, jsonSourceMap} = gen(samples.kcode.helloWorld);
         const sourceMap = JSON.parse(jsonSourceMap);
-        expect(log.hasSomeLogs).false;
-        expect(sourceMap.sources).eql(['default']);
         expect(sourceMap.sourcesContent).eql([samples.kcode.helloWorld]);
         snapshot(jscode);
         snapshot(sourceMap);
-        expect(log.hasSomeLogs).false;
     });
-
-
 });

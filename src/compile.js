@@ -103,7 +103,6 @@ function compileFile(               /* istanbul ignore next */
     }
 }
 
-
 // *Most default args (but the last) are provided to give type hints.
 function compileCode(   /* istanbul ignore next */
     log = new Logger,
@@ -118,9 +117,14 @@ function compileCode(   /* istanbul ignore next */
         return;
     }
 
-    let { jscode, jsonSourceMap } = kgen(log, kcode, {sourceName});
+    let { jscode, jsonSourceMap, errors } = kgen(kcode, {sourceName});
 
-    if (log.hasErrors) return;
+    if (errors.length){
+        for(const err of errors) {
+            log.error(err.message)
+        }
+        return;
+    };
 
     if(checkonly)
     {

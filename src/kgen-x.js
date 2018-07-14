@@ -2,20 +2,18 @@
 
 // const klex = require('./klex');
 const kgen = require('./kgen');
-const Logger = require('./logger');
 const helloWorld = (require('./samples')).kcode.helloWorld;
-const io = require('./io-node');
-const log = new Logger({io});
 
 // klex.lexAll(helloWorld).forEach( token => console.log(token));
 
-let {jscode, jsonMap} = kgen(log, helloWorld);
+let {parsing, jscode, jsonSourceMap, errors} = kgen(helloWorld);
+console.log(parsing);
 console.log(jscode);
-console.log(jsonMap);
+console.log(jsonSourceMap);
+console.assert(!errors.lenght);
 
-({jscode, jsonMap} = kgen(log, "$"));
-console.log(jscode);
-console.log(jsonMap);
-console.log(log.errors);
-
-
+({jscode, jsonSourceMap, errors} = kgen("$"));
+console.assert(!jscode, "!jscode");
+console.assert(!jsonSourceMap, "!jsonSourceMap");
+console.assert(errors.length === 1, "Only one error");
+console.log(errors[0].toString());

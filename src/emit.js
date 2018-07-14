@@ -56,6 +56,6 @@ function emit(              /* istanbul ignore next: type hint */
 
     function js_line(token = new Token)
     {
-        return jsgen(token.info.jscode, sourceName, token.line, token.col + token.info.offset);
+        return jsgen(token.info.jscode, sourceName, token.line, token.column + token.info.offset);
     }
 }
