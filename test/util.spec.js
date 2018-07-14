@@ -28,13 +28,13 @@ describe('util', function() {
     });
 
     it('#nextPosition', function() {
-        expect(nextPosition()).eql({line:1, col:1});
-        expect(nextPosition(" ")).eql({line:1, col:1});
-        expect(nextPosition("   ", 3)).eql({line:1, col:4});
-        expect(nextPosition("   \n\n   ", 8)).eql({line:3, col:4});
-        expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, col:4});
+        expect(nextPosition()).eql({line:1, col:0});
+        expect(nextPosition(" ")).eql({line:1, col:0});
+        expect(nextPosition("   ", 3)).eql({line:1, col:3});
+        expect(nextPosition("   \n\n   ", 8)).eql({line:3, col:3});
+        expect(nextPosition("   \n\n   ", 8, 5)).eql({line:1, col:3});
         expect(nextPosition("   \n\n   ", 8, 5, 0, 0)).eql({line:0, col:3});
-        expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, col:4});
+        expect(nextPosition("   \n\n   \n\n   ", 13, 5, 10, 10)).eql({line:12, col:3});
     });
 
     it('#sourceMapComment', function() {

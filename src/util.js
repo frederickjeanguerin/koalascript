@@ -31,19 +31,19 @@ function countChar (text, char) {
 
 /**
  * Computes the next position {line, column} of a token from the position of a previous one.
- * Lines are counted starting at 1 and column starting at 1.
+ * Lines are counted starting at 1 and column starting at 0.
  */
 function nextPosition ( /* istanbul ignore next: type hint */
     code = "",          /* istanbul ignore next: type hint */
     nextOffset = 0,     /* istanbul ignore next: type hint */
     prevOffset = 0,     /* istanbul ignore next: type hint */
     prevLine = 1,       /* istanbul ignore next: type hint */
-    prevCol = 1,
+    prevCol = 0,
 ) {
     let line = prevLine, col = prevCol;
     for( let offset = prevOffset; offset < nextOffset; offset++ ) {
         if(code[offset] === "\n") {
-            col = 1;
+            col = 0;
             line ++;
         } else {
             col ++;

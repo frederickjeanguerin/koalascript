@@ -641,7 +641,7 @@ Lexer.prototype.expandDefinitions = function (source) {
 
 Lexer.prototype.resetIndex = function(offset = 0)
 {
-    const {line, col} = nextPosition(this.source, offset, 0, 1, 1);
+    const {line, col} = nextPosition(this.source, offset, 0, 1, 0);
     this.index = offset;
     this.line = line;
     this.col = col;

@@ -46,7 +46,7 @@ describe('klex', function() {
 
     it('Unexpected characters should lex an error token', function() {
         const unmatchedChar = "¸";
-        const kcode = ` ${unmatchedChar}   ${unmatchedChar}${unmatchedChar}  `;
+        const kcode = `  ${unmatchedChar}   ${unmatchedChar}${unmatchedChar}  `;
 
         expect(lexallTypes(kcode)).eql(
             Array(3).fill(TT.unmatched_char));
@@ -54,7 +54,7 @@ describe('klex', function() {
         expect(lexall(kcode)[0]).eql({
             type: TT.unmatched_char,
             text: unmatchedChar,
-            index: 1,
+            index: 2,
             col: 2,
             line: 1,
             info: undefined

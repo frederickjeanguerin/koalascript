@@ -23,8 +23,7 @@ function jsgen (jscode, sourceName, lineOffset, columnOffset)
     const pos =
     {
         line: lineOffset,
-        // source map column starts at 0
-        column: columnOffset - 1
+        column: columnOffset
     }
 
     const jsnode = new SourceNode(pos.line, pos.column, sourceName);
