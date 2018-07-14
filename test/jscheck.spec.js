@@ -33,5 +33,12 @@ describe('jscheck', function() {
         checkSyntax("1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:100, column:203})
         checkSyntax("\n\n1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:102, column:3})
         checkSyntax("\n ) \n1 +", {assumeBrowser, jscodeLine:100, jscodeColumn:200}).position.should.eql({line:101, column:2})
+
+        checkSyntax(`
+            // some simple program
+            console.log(10)
+            + ) // some error
+            + ) // other error
+        `, {assumeBrowser}).position.should.eql({line:4, column:15})
     }
 });
