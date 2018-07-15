@@ -4,12 +4,15 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = [
     // Development
     {
-        entry: './src/browser.js',
+        entry: {
+            browserdev: './src/browser-dev.js',
+            browserkgen: './src/browser-kgen.js',
+        },
         output: {
-            filename: '_browser.js',
+            filename: '_[name].bundle.js',
             path: path.resolve(__dirname, 'src')
         },
-        devtool: 'inline-source-map',
+        devtool: 'source-map', // inline-source-map
         mode: "development",
         plugins: [
             new BundleAnalyzerPlugin({
@@ -18,19 +21,29 @@ module.exports = [
                 openAnalyzer: false,
             })
         ],
-    },
-    // Production
-    {
-        entry: './src/browser.js',
-        output: {
-            filename: '_browser.min.js',
-            path: path.resolve(__dirname, 'src')
+        node: {
+            fs: "empty",
+            Buffer: false,
         },
-        devtool: 'source-map',
-        mode: "production",
-        performance: {
-            maxEntrypointSize: 300000,
-            maxAssetSize: 300000,
+        externals: {
+            buffer: 'Buffer'
         }
     },
+    // Production
+    // {
+    //     entry: './src/browser.js',
+    //     output: {
+    //         filename: '_browser.min.js',
+    //         path: path.resolve(__dirname, 'src')
+    //     },
+    //     devtool: 'source-map',
+    //     mode: "production",
+    //     performance: {
+    //         maxEntrypointSize: 300000,
+    //         maxAssetSize: 300000,
+    //     },
+    //     node: {
+    //         fs: "empty"
+    //     },
+    // },
 ];

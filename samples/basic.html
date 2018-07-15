@@ -27,6 +27,7 @@
         $ document.querySelector('h1').innerHTML += msg2 + "<br>"
     </script>
 
+    <!--
     <script type="text/k">
         # some JS syntax error
         $ 1 +
@@ -35,24 +36,25 @@
     <script type="text/k">
         # some K syntax error
         $
-    </script>
+    </script> -->
 
     <!-- Load and run a K file -->
-    <script type="text/k" src="basic.k"></script>
+    <!-- <script type="text/k" src="basic.k"></script> -->
 
     <!-- Bad local source -->
-    <script type="text/k" src="basic.kk"></script>
+    <!-- <script type="text/k" src="basic.kk"></script> -->
 
     <!-- Bad external source -->
-    <script type="text/k" src="http://unknown-domain/basic.k"></script>
+    <!-- <script type="text/k" src="http://unknown-domain/basic.k"></script> -->
 
     <!-- Bad local source with replacement code -->
-    <script type="text/k" src="unreachable.k">
+    <!-- <script type="text/k" src="unreachable.k">
         $ console.info("Unloaded file replaced by this log!")
-    </script>
+    </script> -->
 
     <!-- The klang library must be included at the end (or deferred) -->
     <!-- Otherwise it cant see the unparsed script tags coming after -->
-    <script src="../src/_browser.js"></script>
+    <script src="../src/_browserkgen.bundle.js"></script>
+    <script src="../src/_browserdev.bundle.js"></script>
 </body>
 </html>

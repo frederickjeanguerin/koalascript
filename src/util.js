@@ -6,6 +6,8 @@ module.exports =
     sourceMapComment,
 };
 
+const Base64 = require('js-base64').Base64
+
 /**
  * @param  {string} text
  * @returns {number} Number of lines of text (new line + 1)
@@ -54,12 +56,11 @@ function nextPosition ( /* istanbul ignore next: type hint */
 
 function sourceMapComment(sourceMap)
 {
-    // code coming from source-map-converter
     if( typeof sourceMap === "object")
     {
         sourceMap = JSON.stringify(sourceMap);
     }
     const jsonMap = sourceMap;
-    const base64Map = new Buffer.from(jsonMap).toString('base64');
+    const base64Map = Base64.encode(jsonMap);
     return '//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64Map;
 }

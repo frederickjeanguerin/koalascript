@@ -1,0 +1,1 @@
+window.kgen = require('./kgen');

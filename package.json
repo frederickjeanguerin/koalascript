@@ -52,6 +52,7 @@
     "convert-source-map": "^1.5.1",
     "escodegen": "^1.10.0",
     "is-keyword-js": "^1.0.3",
+    "js-base64": "^2.4.6",
     "js-tokens": "^4.0.0",
     "json5": "^1.0.1",
     "path-parse": "^1.0.5",

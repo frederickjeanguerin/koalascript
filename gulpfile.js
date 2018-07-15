@@ -31,6 +31,8 @@ task('clean', function() {
 
 task('pack', ['nearley'], run('npx webpack'));
 
+task('browser', run('npx webpack --config webpack.browser-only.config.js'));
+
 task('delete-snapshots', function(){
     return del(['__snapshots__/**']);
 });
