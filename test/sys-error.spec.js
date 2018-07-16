@@ -23,9 +23,8 @@ describe('sys-error', function() {
 
     it('#filteredStack', function() {
         let error = new SysError;
-        countLines(error.filteredStack("")).should.be.greaterThan(1)
-        countLines(error.filteredStack("not/in/the/path")).should.eq(0)
         countLines(error.filteredStack()).should.eq(1, error.filteredStack())
+        countLines(error.filteredStack({withNodeModules: true})).should.be.gt(0)
     });
 
     it('#log', function() {

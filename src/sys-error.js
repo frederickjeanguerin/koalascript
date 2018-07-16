@@ -27,14 +27,17 @@ class SysError extends Error
         if(Error.captureStackTrace) Error.captureStackTrace(this, stackTraceUpToFn);
     }
 
-    filteredStack(traceDir = pathParse(__dirname).dir) {
-        return this.stack.split('\n').filter(trace => trace.includes(traceDir)).join('\n')
+    filteredStack({withNodeModules = false} = {}) {
+        const projectDir = pathParse(__dirname).dir
+        return this.stack.split('\n').filter(trace =>
+            trace.includes(projectDir) && (withNodeModules || !trace.includes('node_modules'))
+        ).join('\n')
     }
 
-    log({logFn = console.error, withArgs = true, withStack = true, traceDir = undefined} = {}) {
+    log({logFn = console.error, withArgs = true, withStack = true, withNodeModules = false} = {}) {
         logFn(this.__proto__.constructor.name, this.message ? ": " + this.message : undefined)
         if(withArgs && Object.keys(this.infos).length) logFn(this.infos)
-        if(withStack) logFn(this.filteredStack(traceDir))
+        if(withStack) logFn(this.filteredStack({withNodeModules}))
     }
 
 };
