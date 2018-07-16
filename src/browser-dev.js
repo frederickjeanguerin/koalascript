@@ -5,6 +5,11 @@ if(!window.kgen)
     console.error("kgen module should be loaded before browser")
 }
 
-console.warn("Klang module loaded : not intended for production!");
+console.warn("Klang module loading : not intended for production!");
 
-browserMain(window, window.kgen)
+console.log('fetch:', window.fetch !== undefined)
+
+console.log('kdebug:', window.kdebug)
+
+window.kloaded = browserMain(window, window.kgen)
+

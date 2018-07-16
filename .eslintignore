@@ -3,3 +3,4 @@ build
 dist
 src/klex.js
 src/_*
+*.bundle.js

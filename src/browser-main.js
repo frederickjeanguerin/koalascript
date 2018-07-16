@@ -2,7 +2,7 @@ const {sourceMapComment} = require('./util');
 
 module.exports = async function browserMain (window, kgen) {
 
-    const debug = window.location.href.includes('debug') ? (...args) => console.log(...args) : () => {}
+    const debug = (window.location.href.includes('debug') || window.kdebug) ? (...args) => console.log(...args) : () => {}
 
     const document = window.document;
 
@@ -10,6 +10,8 @@ module.exports = async function browserMain (window, kgen) {
 
     for( const [i, kscript] of kscripts.entries())
     {
+        // scripts are executed sequentially at the moment
+        // in case there is an order dependency between them
         await runKScript(kscript, i)
     }
 
@@ -37,14 +39,14 @@ module.exports = async function browserMain (window, kgen) {
         debug("fetching:", url)
         try
         {
-            const response = await fetch(url);
+            const response = await window.fetch(url);
             if (response.ok)
             {
                 return await response.text();
             }
             else
             {
-                console.error("Can't reach: " + url);
+                console.error("Can't reach:", url, "\nresponse:", response);
             }
         }
         catch(e)

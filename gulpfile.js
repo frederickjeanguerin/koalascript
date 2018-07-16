@@ -26,7 +26,7 @@ task('nearley', () =>
 );
 
 task('clean', function() {
-    return del(['src/_*', 'samples/*.js', 'coverage/**', '.nyc_output/**', 'temp/**']);
+    return del(['src/_*', 'samples/k/*.js', 'coverage/**', '.nyc_output/**', 'temp/**']);
 });
 
 task('pack', ['nearley'], run('npx webpack'));
